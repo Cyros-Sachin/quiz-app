@@ -1,0 +1,111 @@
+/* Global Styles */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Arial', sans-serif;
+  background-color: #1a1a1a; /* Dark background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+/* Glassmorphism Background */
+.bg-darkBg {
+  background: rgba(0, 0, 0, 0.3); /* Transparent black background */
+  backdrop-filter: blur(10px); /* Frosted glass effect */
+  border-radius: 12px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 400px; /* Limit the max width */
+  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Button Hover Gradient */
+.bg-neon {
+  background: linear-gradient(45deg, #ff00c5, #00fffb);
+  background-size: 200% 200%;
+  animation: gradientBG 1.5s ease infinite;
+}
+
+button:hover {
+  filter: brightness(1.2);
+  cursor: pointer;
+}
+
+/* Neon Gradient Background Animation */
+@keyframes gradientBG {
+  0% {
+    background-position: 200% 0%;
+  }
+  50% {
+    background-position: 0% 100%;
+  }
+  100% {
+    background-position: 200% 0%;
+  }
+}
+
+/* Styling for the Login Form Title */
+h1 {
+  font-size: 2rem;
+  text-align: center;
+  color: #00fffb;
+  margin-bottom: 20px;
+}
+
+/* Form Styling */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Input Fields */
+input[type="email"],
+input[type="password"] {
+  background-color: rgba(255, 255, 255, 0.1); /* Light transparent background */
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 12px;
+  border-radius: 8px;
+  color: white;
+  width: 100%;
+  font-size: 1rem;
+  transition: border 0.3s ease-in-out;
+}
+
+input[type="email"]:focus,
+input[type="password"]:focus {
+  border: 1px solid #00fffb; /* Focus effect with neon border */
+  outline: none;
+}
+
+/* Submit Button Styling */
+button[type="submit"] {
+  padding: 14px;
+  background: #00fffb;
+  color: white;
+  border-radius: 8px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+button[type="submit"]:hover {
+  background: #ff00c5;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #00fffb;
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+}
