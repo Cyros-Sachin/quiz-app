@@ -1,5 +1,5 @@
 const express = require("express");
-const Question = require("../models/Question"); // Import the Question model
+const Question = require("../models/Question");
 const QuizResult = require("../models/QuizResult");
 
 const router = express.Router();
@@ -12,17 +12,18 @@ router.post("/submit", async (req, res) => {
   try {
     // Fetch all questions from the database
     const questions = await Question.find();
-    
+
     // Check answers and calculate score
-    questions.forEach(q => {
+    questions.forEach((q) => {
       if (answers[q._id] === q.correctAnswer) {
         score++;
       }
     });
 
     // Save the quiz result with the score and userId
-    await new QuizResult({ userId, score, submittedAt: new Date() }).save();
-    res.send("Quiz submitted");
+    const quizResult = await new QuizResult({ userId, score, submittedAt: new Date() }).save();
+
+    res.send({ userId: userId }); // Ensure the userId is returned in the response
   } catch (err) {
     res.status(500).json({ message: "Error submitting quiz", error: err.message });
   }

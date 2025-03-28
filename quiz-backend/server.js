@@ -11,7 +11,12 @@ const { mongoURI } = require("./config");
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, { cors: { origin: "*" } });
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:3000", // Frontend URL
+    methods: ["GET", "POST"],
+  },
+});
 
 // Connect to MongoDB
 mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -31,9 +36,14 @@ app.use("/api/quiz", quizRoutes);
 io.on("connection", (socket) => {
   console.log("🟢 A user connected");
 
-  // Listen for the "startQuiz" event to broadcast to all users
+  // Listen for the "startQuiz" event to broadcast to all users after a delay
   socket.on("startQuiz", () => {
-    io.emit("quizStarted");
+    console.log("🚀 Quiz will start in 10 seconds...");
+    // Wait for 10 seconds before broadcasting the quiz started event
+    setTimeout(() => {
+      io.emit("quizStarted");
+      console.log("📢 Quiz Started!");
+    }, 10000); // 10 seconds delay
   });
 
   // Handle user disconnection

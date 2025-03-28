@@ -41,9 +41,14 @@ function Leaderboard() {
             {leaderboard.map((user, index) => (
               <tr key={index} className="hover:bg-gray-700 transition-colors">
                 <td className="p-2">{index + 1}</td>
-                <td className="p-2">{user.userId.name}</td>
+                <td className="p-2">
+                  {/* Safely access name using optional chaining */}
+                  {user.userId?.name || "Anonymous"}
+                </td>
                 <td className="p-2">{user.score}</td>
-                <td className="p-2">{new Date(user.submittedAt).toLocaleTimeString()}</td>
+                <td className="p-2">
+                  {new Date(user.submittedAt).toLocaleTimeString()}
+                </td>
               </tr>
             ))}
           </tbody>

@@ -31,10 +31,18 @@ function Dashboard() {
     }
   };
 
-  // Start the quiz
+  // Start the quiz and automatically start it after 10 seconds
   const startQuiz = () => {
+    setStatusMessage("🚀 Quiz will start in 10 seconds!");
+
+    // Emit the startQuiz event immediately
     socket.emit("startQuiz");
-    setStatusMessage("🚀 Quiz started!");
+
+    // Automatically start the quiz after 10 seconds
+    setTimeout(() => {
+      socket.emit("startQuiz");
+      setStatusMessage("🚀 Quiz started!");
+    }, 10000);
   };
 
   // Listen for quiz start event from the server
@@ -52,7 +60,9 @@ function Dashboard() {
     <div className="h-screen flex flex-col items-center justify-center bg-darkBg">
       <h1 className="text-neon text-3xl mb-4">Admin Dashboard</h1>
 
-      <button className="bg-neon p-2 mb-4" onClick={startQuiz}>Start Quiz</button>
+      <button className="bg-neon p-2 mb-4" onClick={startQuiz}>
+        Start Quiz
+      </button>
 
       <form onSubmit={handleAddQuestion} className="bg-gray-900 p-6 rounded-lg w-1/2">
         <input
