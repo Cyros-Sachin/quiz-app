@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { io } from "socket.io-client";
 
-const socket = io("http://192.168.56.1:5000");
+const socket = io("https://backend-quiz-psi.vercel.app");
 
 function Dashboard() {
   const [question, setQuestion] = useState("");
@@ -21,7 +21,7 @@ function Dashboard() {
     }
 
     try {
-      await axios.post("http://192.168.56.1:5000/api/questions/add", { question, options, correctAnswer });
+      await axios.post("https://backend-quiz-psi.vercel.app/api/questions/add", { question, options, correctAnswer });
       setStatusMessage("Question added successfully!");
       setQuestion("");
       setOptions(["", "", "", ""]);

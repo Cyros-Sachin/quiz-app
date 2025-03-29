@@ -13,7 +13,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: process.env.FRONTEND_URL || "http://192.168.56.1:3000", // Use the environment variable for frontend URL
+    origin: process.env.FRONTEND_URL || "https://quiz-app-xi-lac.vercel.app", // Use the environment variable for frontend URL
     methods: ["GET", "POST"],
   },
 });

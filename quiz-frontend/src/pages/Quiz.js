@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { io } from "socket.io-client";
 
-const socket = io("http://192.168.56.1:5000");
+const socket = io("https://backend-quiz-psi.vercel.app");
 
 function Quiz() {
   const [questions, setQuestions] = useState([]);
@@ -65,7 +65,7 @@ function Quiz() {
     });
 
     // Fetch questions from the backend
-    axios.get("http://192.168.56.1:5000/api/questions").then((res) => {
+    axios.get("https://backend-quiz-psi.vercel.app/api/questions").then((res) => {
       setQuestions(res.data);
     });
 
@@ -103,7 +103,7 @@ function Quiz() {
     }
 
     try {
-      await axios.post("http://192.168.56.1:5000/api/quiz/submit", { userId, answers });
+      await axios.post("https://backend-quiz-psi.vercel.app/api/quiz/submit", { userId, answers });
       setQuizSubmitted(true);
       localStorage.setItem("quizAttempted", "true");  // Set flag that quiz has been attempted
       document.exitFullscreen();

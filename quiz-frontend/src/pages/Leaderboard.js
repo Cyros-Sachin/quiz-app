@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { io } from "socket.io-client";
 
-const socket = io("http://192.168.56.1:5000");  // Connect to your backend server
+const socket = io("https://backend-quiz-psi.vercel.app");  // Connect to your backend server
 
 function Leaderboard() {
   const [leaderboard, setLeaderboard] = useState([]);
@@ -12,7 +12,7 @@ function Leaderboard() {
   useEffect(() => {
     // Fetch initial leaderboard data
     axios
-      .get("http://192.168.56.1:5000/api/quiz/leaderboard")
+      .get("https://backend-quiz-psi.vercel.app/api/quiz/leaderboard")
       .then((res) => {
         setLeaderboard(res.data);
         setLoading(false);

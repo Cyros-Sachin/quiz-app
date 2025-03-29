@@ -10,7 +10,7 @@ function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://192.168.56.1:5000/api/auth/login", { email, password });
+      const res = await axios.post("https://backend-quiz-psi.vercel.app/api/auth/login", { email, password });
   
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("userId", res.data.userId);  // ✅ Ensure correct userId is stored
