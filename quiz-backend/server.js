@@ -11,12 +11,22 @@ const { mongoURI } = require("./config");
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, {
+app.use(
+  cors({
+    origin: "https://quiz-app-xi-lac.vercel.app", // Your frontend URL
+    methods: ["GET", "POST"],
+    credentials: true,
+  })
+);
+
+// ✅ Apply CORS for Socket.io
+const io = socketIo(server, {
   cors: {
-    origin: process.env.FRONTEND_URL || "https://quiz-app-xi-lac.vercel.app", // Use the environment variable for frontend URL
+    origin: "https://quiz-app-xi-lac.vercel.app", // Your frontend URL
     methods: ["GET", "POST"],
   },
 });
+
 
 let quizStarted = false;  // Global state for whether the quiz is started
 
