@@ -3,23 +3,28 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const http = require("http");
-const { Server } = require("socket.io");
+const { Server } = require("socket.io"); // Use `Server` from `socket.io`
 const authRoutes = require("./routes/authRoutes");
 const questionRoutes = require("./routes/questionRoutes");
-const quizRoutes = require("./routes/quizRoutes"); // Ensure quizRoutes is properly updated
+const quizRoutes = require("./routes/quizRoutes");
 const { mongoURI } = require("./config");
 
 const app = express();
 const server = http.createServer(app);
+
+// Proper CORS settings for Express
 app.use(cors({
   origin: "https://quiz-app-xi-lac.vercel.app",
-  methods: ["GET", "POST"],
+  methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
 }));
 
-// Apply CORS specifically to socket.io
-const io = socketIo(server, {
+// Middleware
+app.use(express.json());
+
+// Initialize Socket.io with CORS settings
+const io = new Server(server, {
   cors: {
     origin: "https://quiz-app-xi-lac.vercel.app",
     methods: ["GET", "POST"],
@@ -27,8 +32,6 @@ const io = socketIo(server, {
     credentials: true
   }
 });
-
-let quizStarted = false;  // Global state for whether the quiz is started
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI || mongoURI, {
@@ -38,43 +41,43 @@ mongoose.connect(process.env.MONGO_URI || mongoURI, {
   .then(() => console.log("✅ MongoDB Connected"))
   .catch((err) => console.log("❌ MongoDB Connection Error:", err));
 
-// Middleware
-app.use(cors());
-app.use(express.json());
-
-// Routes
-app.use("/api/auth", authRoutes);
-app.use("/api/questions", questionRoutes);
-app.use("/api/quiz", quizRoutes);
+let quizStarted = false;  // Global state for whether the quiz is started
 
 // Socket.io event handlers
 io.on("connection", (socket) => {
   console.log("🟢 A user connected");
 
   socket.emit("quizState", { quizStarted });
-  // Listen for the "startQuiz" event to broadcast to all users after a delay
+
   socket.on("startQuiz", () => {
+    quizStarted = true;
     io.emit("quizStarted");
     console.log("📢 Quiz Started!");
   });
 
   socket.on("stopQuiz", () => {
-    quizStarted = false;  // Set quiz as stopped
-    io.emit("quizStopped");  // Emit the event to notify all users
-    console.log("📢 Quiz stopped!");
+    quizStarted = false;
+    io.emit("quizStopped");
+    console.log("📢 Quiz Stopped!");
   });
 
-  // Handle user disconnection
   socket.on("disconnect", () => {
     console.log("🔴 A user disconnected");
   });
 });
 
-// Setup quiz routes for real-time leaderboard updates
-quizRoutes.setIo(io);  // Ensure quizRoutes can emit real-time leaderboard updates
+// Ensure quizRoutes can use Socket.io
+if (quizRoutes.setIo) {
+  quizRoutes.setIo(io);
+}
+
+// Routes
+app.use("/api/auth", authRoutes);
+app.use("/api/questions", questionRoutes);
+app.use("/api/quiz", quizRoutes);
 
 // Start the server
 const PORT = process.env.PORT || 5000;
-server.listen(PORT,() => {
+server.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
