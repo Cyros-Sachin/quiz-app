@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { io } from "socket.io-client";
-
-const socket = io("https://backend-quiz-psi.vercel.app");  // Connect to your backend server
-
+const socket = io("https://backend-quiz-psi.vercel.app", {
+  transports: ["websocket"], // Force WebSocket connection (no polling)
+  withCredentials: true, // If you need credentials (cookies, etc.)
+});
 function Leaderboard() {
   const [leaderboard, setLeaderboard] = useState([]);
   const [loading, setLoading] = useState(true);
