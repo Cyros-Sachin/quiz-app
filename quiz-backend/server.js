@@ -31,7 +31,7 @@ const io = new Server(server, {
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true
   },
-  transports: ["websocket"], // ✅ Force only WebSockets, NO POLLING
+  transports: ["websocket","polling"], // ✅ Force only WebSockets, NO POLLING
 });
 
 let quizStarted = false;
