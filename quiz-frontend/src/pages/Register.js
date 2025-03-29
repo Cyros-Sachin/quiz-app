@@ -11,7 +11,7 @@ function Register() {
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("https://backend-quiz-psi.vercel.app/api/auth/register", { name, email, password, role: "student" });
+      await axios.post("https://quiz-app-so3y.onrender.com/api/auth/register", { name, email, password, role: "student" });
       navigate("/");
     } catch (err) {
       alert("Registration failed!");

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { io } from "socket.io-client";
 
-const socket = io("https://backend-quiz-psi.vercel.app", {
+const socket = io("https://quiz-app-so3y.onrender.com", {
   transports: ["websocket"], // Force WebSocket connection (no polling)
   withCredentials: true, // If you need credentials (cookies, etc.)
 });
@@ -68,7 +68,7 @@ function Quiz() {
     });
 
     // Fetch questions from the backend
-    axios.get("https://backend-quiz-psi.vercel.app/api/questions").then((res) => {
+    axios.get("https://quiz-app-so3y.onrender.com/api/questions").then((res) => {
       setQuestions(res.data);
     });
 
@@ -106,7 +106,7 @@ function Quiz() {
     }
 
     try {
-      await axios.post("https://backend-quiz-psi.vercel.app/api/quiz/submit", { userId, answers });
+      await axios.post("https://quiz-app-so3y.onrender.com/api/quiz/submit", { userId, answers });
       setQuizSubmitted(true);
       localStorage.setItem("quizAttempted", "true");  // Set flag that quiz has been attempted
       document.exitFullscreen();
