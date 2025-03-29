@@ -3,7 +3,7 @@ import axios from "axios";
 import { io } from "socket.io-client";
 
 const socket = io("https://backend-quiz-psi.vercel.app", {
-  transports: ["polling"], // Force WebSocket connection (no polling)
+  transports: ["websocket"], // Force WebSocket connection (no polling)
   withCredentials: true, // If you need credentials (cookies, etc.)
 });
 
