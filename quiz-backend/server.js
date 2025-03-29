@@ -24,6 +24,7 @@ const io = socketIo(server, {
   cors: {
     origin: "https://quiz-app-xi-lac.vercel.app", // Your frontend URL
     methods: ["GET", "POST"],
+    credentials: true,
   },
 });
 
