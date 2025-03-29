@@ -11,7 +11,12 @@ const { mongoURI } = require("./config");
 
 const app = express();
 const server = http.createServer(app);
-
+mongoose.connect(process.env.MONGO_URI || mongoURI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+  .then(() => console.log("✅ MongoDB Connected"))
+  .catch((err) => console.log("❌ MongoDB Connection Error:", err));
 // Proper CORS settings for Express
 app.use(cors({ origin: "*" }));
 
@@ -21,8 +26,8 @@ app.use(express.json());
 // Initialize Socket.io and force WebSockets (NO POLLING)
 const io = new Server(server, {
   cors: {
-      origin: "https://quiz-app-xi-lac.vercel.app", // Replace with your frontend URL
-      methods: ["GET", "POST"]
+    origin: "*", // Replace with your frontend URL
+    methods: ["GET", "POST"]
   }
 });
 
