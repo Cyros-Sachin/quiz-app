@@ -176,7 +176,7 @@ function Quiz() {
         </button>
       ) : (
         <div style={{ width: "75%", marginTop: "20px" }}>
-          {quizEnded && !quizSubmitted ? (
+          {quizEnded  ? (
             <h1 style={{ color: "red", textAlign: "center" }}>❌ Quiz Over! Time's up.</h1>
           ) : (
             questions.map((q, idx) => (
