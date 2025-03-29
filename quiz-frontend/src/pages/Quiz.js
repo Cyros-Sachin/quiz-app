@@ -28,7 +28,7 @@ function Quiz() {
 
   // Prevent user from switching tabs or minimizing window
   const preventTabSwitch = useCallback(() => {
-    if (document.hidden) {
+    if (document.hidden && !quizEnded) {
       alert("🚫 You can't switch tabs or minimize the window during the quiz!");
       setQuizEnded(true); // End quiz if user switches tabs
     }
