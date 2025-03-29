@@ -106,7 +106,6 @@ function Quiz() {
       setQuizSubmitted(true);
       localStorage.setItem("quizAttempted", "true");  // Set flag that quiz has been attempted
       document.exitFullscreen();
-      alert("Submitted Successfully!!");
       window.location.href = "/leaderboard";
     } catch (error) {
       console.error("❌ Quiz submission error:", error.response?.data || error.message);
