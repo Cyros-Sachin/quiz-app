@@ -100,6 +100,7 @@ function Quiz() {
 
     try {
       await axios.post("https://quiz-app-so3y.onrender.com/api/quiz/submit", { userId, answers });
+      setQuizEnded(true);
       setQuizSubmitted(true);
       localStorage.setItem("quizAttempted", "true");  // Set flag that quiz has been attempted
       document.exitFullscreen();
