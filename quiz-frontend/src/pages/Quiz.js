@@ -28,9 +28,11 @@ function Quiz() {
 
   // Prevent user from switching tabs or minimizing window
   const preventTabSwitch = useCallback(() => {
-    if (document.hidden && !quizEnded) {
-      alert("🚫 You can't switch tabs or minimize the window during the quiz!");
-      setQuizEnded(true); // End quiz if user switches tabs
+    if (document.hidden) {
+      if (!quizSubmitted) {
+        alert("🚫 You can't switch tabs or minimize the window during the quiz!");
+        setQuizEnded(true); // End quiz if user switches tabs
+      }
     }
   }, []);
 
@@ -44,8 +46,9 @@ function Quiz() {
   // Detect if user tries to minimize or switch tabs
   const handleBlur = () => {
     if (quizStarted && !quizEnded) {
-      alert("🚫 You minimized the window! The quiz is now over.");
+      if(!quizSubmitted){alert("🚫 You minimized the window! The quiz is now over.");
       setQuizEnded(true);  // End the quiz if window loses focus
+      }
     }
   };
 
@@ -100,7 +103,6 @@ function Quiz() {
 
     try {
       await axios.post("https://quiz-app-so3y.onrender.com/api/quiz/submit", { userId, answers });
-      setQuizEnded(true);
       setQuizSubmitted(true);
       localStorage.setItem("quizAttempted", "true");  // Set flag that quiz has been attempted
       document.exitFullscreen();
@@ -173,7 +175,7 @@ function Quiz() {
         </button>
       ) : (
         <div style={{ width: "75%", marginTop: "20px" }}>
-          {quizEnded ? (
+          {quizEnded && !quizSubmitted ? (
             <h1 style={{ color: "red", textAlign: "center" }}>❌ Quiz Over! Time's up.</h1>
           ) : (
             questions.map((q, idx) => (
