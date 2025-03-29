@@ -205,11 +205,8 @@ function Quiz() {
               width: "100%",
               marginTop: "20px",
               borderRadius: "5px",
-              cursor: quizEnded || Object.keys(answers).length !== questions.length ? "not-allowed" : "pointer",
-              opacity: quizEnded || Object.keys(answers).length !== questions.length ? 0.5 : 1,
             }}
             onClick={handleSubmit}
-            disabled={quizEnded || Object.keys(answers).length !== questions.length} // Disable submit if quiz ended
           >
             Submit
           </button>
