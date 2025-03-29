@@ -59,7 +59,7 @@ function Quiz() {
     if (checkIfAttempted) {
       setHasAttempted(true);
       alert("🚫 You've already attempted this quiz. Redirecting to the login page.");
-      window.location.href = "/login";  // Redirect to login if attempted
+      window.location.href = "/";  // Redirect to login if attempted
     }
 
     socket.on("quizStarted", () => {
@@ -145,19 +145,14 @@ function Quiz() {
 
   // Add a 10-second delay before starting the quiz
   const handleStartQuiz = () => {
-    if (hasAttempted) {
-      alert("🚫 You've already attempted this quiz.");
-      window.location.href = "/login"; // Redirect to login if attempted
-    } else {
-      setIsWaiting(true);  // Set the waiting state to true
-      enableFullScreen();
+    setIsWaiting(true);  // Set the waiting state to true
+    enableFullScreen();
 
-      // Wait for the admin to start the quiz
-      setTimeout(() => {
-        setIsWaiting(false);  // Reset waiting state after the delay
-        localStorage.setItem("quizStarted", "true");  // Store the state in localStorage
-      }, 10000);  // 10 seconds delay
-    }
+    // Wait for the admin to start the quiz
+    setTimeout(() => {
+      setIsWaiting(false);  // Reset waiting state after the delay
+      localStorage.setItem("quizStarted", "true");  // Store the state in localStorage
+    }, 10000);  // 10 seconds delay
   };
 
   return (
