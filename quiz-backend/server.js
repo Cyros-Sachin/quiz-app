@@ -14,7 +14,7 @@ const server = http.createServer(app);
 
 // Proper CORS settings for Express
 app.use(cors({
-  origin: "https://quiz-app-xi-lac.vercel.app",
+  origin: "*",
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
@@ -26,7 +26,7 @@ app.use(express.json());
 // Initialize Socket.io with CORS settings
 const io = new Server(server, {
   cors: {
-    origin: "https://quiz-app-xi-lac.vercel.app",
+    origin: "*",
     methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true
