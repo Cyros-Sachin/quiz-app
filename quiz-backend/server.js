@@ -21,7 +21,7 @@ app.use(express.json());
 // Initialize Socket.io and force WebSockets (NO POLLING)
 const io = new Server(server, {
   cors: {
-      origin: "https://quiz-app.vercel.app", // Replace with your frontend URL
+      origin: "https://quiz-app-xi-lac.vercel.app", // Replace with your frontend URL
       methods: ["GET", "POST"]
   }
 });
