@@ -27,7 +27,7 @@ const io = socketIo(server, {
     credentials: true,
   },
 });
-
+app.set('trust proxy', 1);
 
 let quizStarted = false;  // Global state for whether the quiz is started
 
