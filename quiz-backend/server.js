@@ -3,7 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const http = require("http");
-const { Server } = require("socket.io"); // Use `Server` from `socket.io`
+const { Server } = require("socket.io");
 const authRoutes = require("./routes/authRoutes");
 const questionRoutes = require("./routes/questionRoutes");
 const quizRoutes = require("./routes/quizRoutes");
@@ -14,7 +14,7 @@ const server = http.createServer(app);
 
 // Proper CORS settings for Express
 app.use(cors({
-  origin: "*",
+  origin: "https://quiz-app-xi-lac.vercel.app",
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
@@ -23,25 +23,18 @@ app.use(cors({
 // Middleware
 app.use(express.json());
 
-// Initialize Socket.io with CORS settings
+// Initialize Socket.io and force WebSockets (NO POLLING)
 const io = new Server(server, {
   cors: {
-    origin: "*",
+    origin: "https://quiz-app-xi-lac.vercel.app",
     methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true
-  }
+  },
+  transports: ["websocket"], // ✅ Force only WebSockets, NO POLLING
 });
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI || mongoURI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-  .then(() => console.log("✅ MongoDB Connected"))
-  .catch((err) => console.log("❌ MongoDB Connection Error:", err));
-
-let quizStarted = false;  // Global state for whether the quiz is started
+let quizStarted = false;
 
 // Socket.io event handlers
 io.on("connection", (socket) => {
