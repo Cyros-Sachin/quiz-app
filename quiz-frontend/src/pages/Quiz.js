@@ -54,13 +54,6 @@ function Quiz() {
   };
 
   useEffect(() => {
-    // Check if the user has already attempted the quiz
-    const checkIfAttempted = localStorage.getItem("quizAttempted");
-    if (checkIfAttempted) {
-      setHasAttempted(true);
-      alert("🚫 You've already attempted this quiz. Redirecting to the login page.");
-      window.location.href = "/";  // Redirect to login if attempted
-    }
 
     socket.on("quizStarted", () => {
       setQuizStarted(true);
