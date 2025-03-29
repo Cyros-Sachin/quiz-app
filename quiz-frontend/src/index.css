@@ -10,15 +10,20 @@ body {
   min-height: 100vh;
 }
 
-/* Glassmorphism Background */
 .bg-darkBg {
-  background: rgba(0, 0, 0, 0.3); /* Transparent black background */
-  backdrop-filter: blur(10px); /* Frosted glass effect */
-  border-radius: 12px;
-  padding: 2rem;
+  background: rgba(0, 0, 0, 0.5); /* Slightly darker background for better contrast */
+  backdrop-filter: blur(12px); /* Stronger frosted glass effect */
+  border-radius: 16px; /* Slightly more rounded corners */
+  padding: 3rem 2rem; /* More generous padding */
   width: 100%;
-  max-width: 400px; /* Limit the max width */
-  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.2);
+  max-width: 500px; /* Slightly wider container */
+  margin: auto; /* Center the container */
+  box-shadow: 0px 6px 30px rgba(0, 0, 0, 0.3); /* Softer, more pronounced shadow */
+  transition: all 0.3s ease-in-out; /* Smooth transition effect */
+}
+
+.bg-darkBg:hover {
+  transform: scale(1.05); /* Slight zoom effect when hovering */
 }
 
 /* Button Hover Gradient */
@@ -26,11 +31,20 @@ body {
   background: linear-gradient(45deg, #ff00c5, #00fffb);
   background-size: 200% 200%;
   animation: gradientBG 1.5s ease infinite;
+  padding: 10px 20px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 25px; /* More rounded button */
+  color: #fff;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-button:hover {
-  filter: brightness(1.2);
+.bg-neon:hover {
+  filter: brightness(1.3); /* Slightly brighter */
   cursor: pointer;
+  transform: scale(1.05); /* Hover zoom effect */
+  box-shadow: 0px 6px 18px rgba(0, 255, 255, 0.6); /* Neon glow effect */
 }
 
 /* Neon Gradient Background Animation */
@@ -46,8 +60,15 @@ button:hover {
   }
 }
 
+
 /* Styling for the Login Form Title */
 h1 {
+  font-size: 2rem;
+  text-align: center;
+  color: #00fffb;
+  margin-bottom: 20px;
+}
+.h1 {
   font-size: 2rem;
   text-align: center;
   color: #00fffb;
@@ -76,6 +97,22 @@ input[type="password"] {
 
 input[type="email"]:focus,
 input[type="password"]:focus {
+  border: 1px solid #00fffb; /* Focus effect with neon border */
+  outline: none;
+}
+.p-2{
+  margin-top: 1.2rem;
+  background-color: rgba(255, 255, 255, 0.1); /* Light transparent background */
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 12px;
+  border-radius: 8px;
+  color: white;
+  width: 90%;
+  font-size: 1rem;
+  transition: border 0.3s ease-in-out;
+}
+
+.p-2:focus {
   border: 1px solid #00fffb; /* Focus effect with neon border */
   outline: none;
 }
@@ -109,3 +146,117 @@ button[type="submit"]:hover {
 ::-webkit-scrollbar-track {
   background: rgba(0, 0, 0, 0.1);
 }
+/* Normal CSS for styling the leaderboard */
+/* Leaderboard Container */
+.leader-container {
+  padding: 2rem 4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #121212;
+  color: white;
+  height: 100vh;
+  justify-content: center;
+  text-align: center;
+  overflow-y: auto;
+}
+
+/* Heading */
+.leader-container h1 {
+  font-size: 3rem;
+  color: #39ff14;  /* Neon green color */
+  margin-top: 5rem;
+  text-shadow: 0 0 15px rgba(57, 255, 20, 0.9), 0 0 30px rgba(57, 255, 20, 0.7); /* Glowing effect */
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+/* Table Layout */
+table {
+  width: 90%; /* Increased width for better readability */
+  margin-top: 3rem;
+  border-collapse: collapse;
+  border-radius: 12px; /* Rounded corners */
+  overflow: hidden;
+  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.2); /* Subtle shadow for table */
+}
+
+/* Table Headers */
+table th {
+  padding: 1.5rem;
+  background-color: #1a1a1a;
+  color: #39ff14; /* Neon green header */
+  font-size: 1.2rem;
+  text-align: center;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0px 2px 10px rgba(0, 255, 100, 0.6); /* Soft neon glow effect */
+}
+
+/* Table Rows */
+table tr:nth-child(even) {
+  background-color: #222;  /* Darker row color */
+}
+
+table tr:nth-child(odd) {
+  background-color: #1a1a1a; /* Slightly lighter background for odd rows */
+}
+
+table tr:hover {
+  background-color: #333;
+  cursor: pointer;
+  transform: translateY(-3px); /* Slight lift effect on hover */
+  transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth hover transition */
+}
+
+/* Table Data */
+table td {
+  padding: 1.2rem;
+  color: #ddd;
+  text-align: left;
+  font-size: 1rem;
+  border-bottom: 1px solid #333;
+}
+
+/* Bold First Column */
+table td:first-child {
+  font-weight: bold;
+  color: #39ff14; /* Neon green for the first column (Rank) */
+}
+
+/* Neon Green Glow Effect on Hover */
+table td:hover {
+  color: #39ff14;
+  text-shadow: 0 0 10px rgba(57, 255, 20, 0.8); /* Subtle neon glow effect on hover */
+}
+
+/* Loading/Error Text */
+.text-red-500 {
+  color: #ff4040;
+  font-weight: bold;
+}
+
+.text-neon {
+  color: #00ffff;
+  font-weight: bold;
+}
+
+/* Neon Pulse Animation for Loading */
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.text-neon.loading {
+  font-size: 1.5rem;
+  animation: pulse 1.5s infinite;
+}
+

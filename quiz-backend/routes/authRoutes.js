@@ -29,26 +29,22 @@ router.post("/register", async (req, res) => {
 // Login route
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
+  const user = await User.findOne({ email });
 
-  try {
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(400).send("Invalid credentials.");
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).send("Invalid credentials.");
-    }
-
-    // Generate JWT token
-    const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: "1h" });
-
-    // Send response with token and user data
-    res.json({ token, user: { id: user._id, name: user.name, email: user.email, role: user.role } });
-  } catch (error) {
-    res.status(500).send("Error logging in: " + error.message);
+  if (!user || !(await bcrypt.compare(password, user.password))) {
+    return res.status(400).send("Invalid credentials");
   }
+
+  const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: "1h" });
+
+  // ✅ Include `userId` in response
+  res.json({
+    token,
+    userId: user._id.toString(),  // Convert MongoDB ObjectId to string
+    role: user.role
+  });
 });
+
+
 
 module.exports = router;

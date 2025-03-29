@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const QuizResultSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-  score: Number,
+  score: { type: Number, default: 0 },
   submittedAt: Date,
 });
 

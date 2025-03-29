@@ -10,13 +10,21 @@ function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/login", { email, password });
+      const res = await axios.post("http://192.168.56.1:5000/api/auth/login", { email, password });
+  
       localStorage.setItem("token", res.data.token);
+      localStorage.setItem("userId", res.data.userId);  // ✅ Ensure correct userId is stored
+      localStorage.setItem("role", res.data.role);
+  
+      console.log("Logged in User ID:", res.data.userId); // Debugging log
+  
       res.data.role === "admin" ? navigate("/dashboard") : navigate("/quiz");
     } catch (err) {
       alert("Invalid credentials!");
     }
   };
+  
+
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600">

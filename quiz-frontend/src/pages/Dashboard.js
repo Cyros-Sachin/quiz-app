@@ -2,14 +2,14 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:5000");
+const socket = io("http://192.168.56.1:5000");
 
 function Dashboard() {
   const [question, setQuestion] = useState("");
   const [options, setOptions] = useState(["", "", "", ""]);
   const [correctAnswer, setCorrectAnswer] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
-
+  const [isQuizStarted, setIsQuizStarted] = useState(false);
   // Handle adding a new question
   const handleAddQuestion = async (e) => {
     e.preventDefault();
@@ -21,7 +21,7 @@ function Dashboard() {
     }
 
     try {
-      await axios.post("http://localhost:5000/api/questions/add", { question, options, correctAnswer });
+      await axios.post("http://192.168.56.1:5000/api/questions/add", { question, options, correctAnswer });
       setStatusMessage("Question added successfully!");
       setQuestion("");
       setOptions(["", "", "", ""]);
@@ -31,43 +31,48 @@ function Dashboard() {
     }
   };
 
-  // Start the quiz and automatically start it after 10 seconds
-  const startQuiz = () => {
-    setStatusMessage("🚀 Quiz will start in 10 seconds!");
-
-    // Emit the startQuiz event immediately
-    socket.emit("startQuiz");
-
-    // Automatically start the quiz after 10 seconds
-    setTimeout(() => {
-      socket.emit("startQuiz");
-      setStatusMessage("🚀 Quiz started!");
-    }, 10000);
-  };
+  
 
   // Listen for quiz start event from the server
   useEffect(() => {
-    socket.on("quizStarted", () => {
-      setStatusMessage("Quiz has started!");
+    // Listen for the current quiz state from the server
+    socket.on("quizState", (data) => {
+      setIsQuizStarted(data.quizStarted);  // Set quiz state based on server
     });
 
     return () => {
-      socket.off("quizStarted");
+      socket.off("quizState");
     };
   }, []);
 
+  const handleStartStop = () => {
+    if (isQuizStarted) {
+      socket.emit("stopQuiz");  // Stop the quiz
+    } else {
+      socket.emit("startQuiz");  // Start the quiz
+    }
+    setIsQuizStarted(!isQuizStarted);  // Toggle the state on the client
+  };
+
   return (
-    <div className="h-screen flex flex-col items-center justify-center bg-darkBg">
+    <div className="bg-darkBg">
       <h1 className="text-neon text-3xl mb-4">Admin Dashboard</h1>
 
-      <button className="bg-neon p-2 mb-4" onClick={startQuiz}>
-        Start Quiz
+      <label htmlFor="toggle" style={{ display: "block", marginBottom: "10px", fontSize: "18px", color: "#39FF14" }}>
+        {isQuizStarted ? "Quiz is currently running. Click to stop." : "Quiz is currently stopped. Click to start."}
+      </label>
+      <button
+        id="toggle"
+        onClick={handleStartStop}
+        className="bg-neon"
+      >
+        {isQuizStarted ? "Stop Quiz" : "Start Quiz"}
       </button>
 
       <form onSubmit={handleAddQuestion} className="bg-gray-900 p-6 rounded-lg w-1/2">
         <input
           type="text"
-          className="p-2 mb-2 w-full"
+          className="p-2"
           placeholder="Question"
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
@@ -77,7 +82,7 @@ function Dashboard() {
           <input
             key={idx}
             type="text"
-            className="p-2 mb-2 w-full"
+            className="p-2"
             placeholder={`Option ${idx + 1}`}
             value={opt}
             onChange={(e) => {
@@ -90,16 +95,16 @@ function Dashboard() {
 
         <input
           type="text"
-          className="p-2 mb-2 w-full"
+          className="p-2"
           placeholder="Correct Answer"
           value={correctAnswer}
           onChange={(e) => setCorrectAnswer(e.target.value)}
         />
 
-        <button className="bg-neon p-2 w-full">Add Question</button>
+        <button className="bg-neon">Add Question</button>
       </form>
 
-      {statusMessage && <div className="text-white mt-4">{statusMessage}</div>}
+      {statusMessage && <div className="h1">{statusMessage}</div>}
     </div>
   );
 }

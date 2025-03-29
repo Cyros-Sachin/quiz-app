@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { io } from "socket.io-client";
+
+const socket = io("http://192.168.56.1:5000");  // Connect to your backend server
 
 function Leaderboard() {
   const [leaderboard, setLeaderboard] = useState([]);
@@ -7,8 +10,9 @@ function Leaderboard() {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    // Fetch initial leaderboard data
     axios
-      .get("http://localhost:5000/api/quiz/leaderboard")
+      .get("http://192.168.56.1:5000/api/quiz/leaderboard")
       .then((res) => {
         setLeaderboard(res.data);
         setLoading(false);
@@ -17,38 +21,43 @@ function Leaderboard() {
         setError("Failed to fetch leaderboard. Please try again.");
         setLoading(false);
       });
+
+    // Listen for leaderboard updates via socket.io
+    socket.on("leaderboardUpdated", (updatedLeaderboard) => {
+      setLeaderboard(updatedLeaderboard);  // Update leaderboard state
+    });
+
+    // Clean up socket listener on component unmount
+    return () => {
+      socket.off("leaderboardUpdated");
+    };
   }, []);
 
   return (
-    <div className="h-screen flex flex-col items-center justify-center bg-darkBg">
-      <h1 className="text-neon text-3xl mb-4">🏆 Leaderboard</h1>
+    <div className="leader-container">
+      <h1>Leaderboard</h1>
 
       {loading ? (
-        <div className="text-neon">Loading...</div>
+        <div>Loading...</div>
       ) : error ? (
-        <div className="text-red-500">{error}</div>
+        <div>{error}</div>
       ) : (
-        <table className="w-3/4 md:w-1/2 bg-gray-900 p-4 rounded-lg shadow-xl">
+        <table className="leaderboard-table">
           <thead>
             <tr>
-              <th className="text-left text-neon">Rank</th>
-              <th className="text-left text-neon">Name</th>
-              <th className="text-left text-neon">Score</th>
-              <th className="text-left text-neon">Time</th>
+              <th>Rank</th>
+              <th>Name</th>
+              <th>Score</th>
+              <th>Time</th>
             </tr>
           </thead>
           <tbody>
             {leaderboard.map((user, index) => (
-              <tr key={index} className="hover:bg-gray-700 transition-colors">
-                <td className="p-2">{index + 1}</td>
-                <td className="p-2">
-                  {/* Safely access name using optional chaining */}
-                  {user.userId?.name || "Anonymous"}
-                </td>
-                <td className="p-2">{user.score}</td>
-                <td className="p-2">
-                  {new Date(user.submittedAt).toLocaleTimeString()}
-                </td>
+              <tr key={user._id}>
+                <td>{index + 1}</td>
+                <td>{user.userId?.name || "Anonymous"}</td>
+                <td>{user.score}</td>
+                <td>{new Date(user.submittedAt).toLocaleTimeString()}</td>
               </tr>
             ))}
           </tbody>

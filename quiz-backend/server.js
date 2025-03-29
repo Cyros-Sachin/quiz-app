@@ -6,20 +6,25 @@ const http = require("http");
 const { Server } = require("socket.io");
 const authRoutes = require("./routes/authRoutes");
 const questionRoutes = require("./routes/questionRoutes");
-const quizRoutes = require("./routes/quizRoutes");
+const quizRoutes = require("./routes/quizRoutes"); // Ensure quizRoutes is properly updated
 const { mongoURI } = require("./config");
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3000", // Frontend URL
+    origin: process.env.FRONTEND_URL || "http://192.168.56.1:3000", // Use the environment variable for frontend URL
     methods: ["GET", "POST"],
   },
 });
 
+let quizStarted = false;  // Global state for whether the quiz is started
+
 // Connect to MongoDB
-mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(process.env.MONGO_URI || mongoURI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
   .then(() => console.log("✅ MongoDB Connected"))
   .catch((err) => console.log("❌ MongoDB Connection Error:", err));
 
@@ -36,14 +41,17 @@ app.use("/api/quiz", quizRoutes);
 io.on("connection", (socket) => {
   console.log("🟢 A user connected");
 
+  socket.emit("quizState", { quizStarted });
   // Listen for the "startQuiz" event to broadcast to all users after a delay
   socket.on("startQuiz", () => {
-    console.log("🚀 Quiz will start in 10 seconds...");
-    // Wait for 10 seconds before broadcasting the quiz started event
-    setTimeout(() => {
-      io.emit("quizStarted");
-      console.log("📢 Quiz Started!");
-    }, 10000); // 10 seconds delay
+    io.emit("quizStarted");
+    console.log("📢 Quiz Started!");
+  });
+
+  socket.on("stopQuiz", () => {
+    quizStarted = false;  // Set quiz as stopped
+    io.emit("quizStopped");  // Emit the event to notify all users
+    console.log("📢 Quiz stopped!");
   });
 
   // Handle user disconnection
@@ -52,8 +60,11 @@ io.on("connection", (socket) => {
   });
 });
 
+// Setup quiz routes for real-time leaderboard updates
+quizRoutes.setIo(io);  // Ensure quizRoutes can emit real-time leaderboard updates
+
 // Start the server
 const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => {
+server.listen(PORT,() => {
   console.log(`🚀 Server running on port ${PORT}`);
 });

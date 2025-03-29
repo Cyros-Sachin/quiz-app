@@ -2,16 +2,20 @@ import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:5000");
+const socket = io("http://192.168.56.1:5000");
 
 function Quiz() {
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState({});
   const [quizStarted, setQuizStarted] = useState(false);
   const [quizEnded, setQuizEnded] = useState(false);
-  const [isWaiting, setIsWaiting] = useState(false); // New state for waiting time
+  const [isWaiting, setIsWaiting] = useState(false);
+  const [quizSubmitted, setQuizSubmitted] = useState(false);
+  const [adminStarted, setAdminStarted] = useState(false);
+  const [hasAttempted, setHasAttempted] = useState(false); // Track if user has already attempted
+  const [timeRemaining, setTimeRemaining] = useState(30 * 60); // Timer in seconds (30 minutes)
 
-  // Full-screen mode function (only works on user gesture)
+  // Full-screen mode function
   const enableFullScreen = () => {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen()
@@ -19,32 +23,66 @@ function Quiz() {
     }
   };
 
-  // Detect if user exits fullscreen and end quiz
-  const detectExit = useCallback(() => {
-    if (!document.fullscreenElement && quizStarted) {
-      alert("🚫 You exited fullscreen! The quiz is now over.");
-      setQuizEnded(true);  // Disable all interactions
+  // Prevent user from switching tabs or minimizing window
+  const preventTabSwitch = useCallback(() => {
+    if (document.hidden) {
+      alert("🚫 You can't switch tabs or minimize the window during the quiz!");
+      setQuizEnded(true); // End quiz if user switches tabs
     }
-  }, [quizStarted]);
+  }, []);
+
+  // Disable all keyboard events
+  const disableKeyboard = (event) => {
+    if (quizStarted && !quizEnded) {
+      event.preventDefault();  // Prevent all keyboard input during the quiz
+    }
+  };
+
+  // Detect if user tries to minimize or switch tabs
+  const handleBlur = () => {
+    if (quizStarted && !quizEnded) {
+      alert("🚫 You minimized the window! The quiz is now over.");
+      setQuizEnded(true);  // End the quiz if window loses focus
+    }
+  };
+
+  const preventContextMenu = (event) => {
+    event.preventDefault();
+  };
 
   useEffect(() => {
+    // Check if the user has already attempted the quiz
+    const checkIfAttempted = localStorage.getItem("quizAttempted");
+    if (checkIfAttempted) {
+      setHasAttempted(true);
+      alert("🚫 You've already attempted this quiz. Redirecting to the login page.");
+      window.location.href = "/login";  // Redirect to login if attempted
+    }
+
     socket.on("quizStarted", () => {
       setQuizStarted(true);
-      enableFullScreen();  // Trigger fullscreen when quiz starts
+      enableFullScreen(); // Trigger fullscreen when quiz starts
     });
 
     // Fetch questions from the backend
-    axios.get("http://localhost:5000/api/questions").then((res) => {
+    axios.get("http://192.168.56.1:5000/api/questions").then((res) => {
       setQuestions(res.data);
     });
 
-    document.addEventListener("fullscreenchange", detectExit);
+    // Prevent right-click (context menu)
+    document.addEventListener("contextmenu", preventContextMenu);
+    window.addEventListener("keydown", disableKeyboard);
+    document.addEventListener("visibilitychange", preventTabSwitch);  // Detect tab switches
+    window.addEventListener("blur", handleBlur);  // Detect if window loses focus
 
     return () => {
-      document.removeEventListener("fullscreenchange", detectExit);
+      document.removeEventListener("contextmenu", preventContextMenu);
+      window.removeEventListener("keydown", disableKeyboard);
+      document.removeEventListener("visibilitychange", preventTabSwitch);
+      window.removeEventListener("blur", handleBlur);  // Remove event listeners when component unmounts
       socket.off("quizStarted");
     };
-  }, [detectExit]);
+  }, [quizStarted, quizEnded, preventTabSwitch, handleBlur]);
 
   // Handle radio button answer selection (disabled if quiz ended)
   const handleAnswerChange = (questionId, selectedOption) => {
@@ -57,33 +95,77 @@ function Quiz() {
   const handleSubmit = async () => {
     if (quizEnded) return;
 
-    const userId = localStorage.getItem("userId");
-    if (!userId) {
-      alert("User is not logged in");
+    let userId = localStorage.getItem("userId");
+    console.log("📢 User ID before submitting:", userId); // Debugging log
+    if (!userId || userId.length !== 24) {
+      alert("❌ Invalid User ID. Please log in again.");
       return;
     }
-    await axios.post("http://localhost:5000/api/quiz/submit", { userId, answers });
-    document.exitFullscreen();
-    window.location.href = "/leaderboard";
+
+    try {
+      await axios.post("http://192.168.56.1:5000/api/quiz/submit", { userId, answers });
+      setQuizSubmitted(true);
+      localStorage.setItem("quizAttempted", "true");  // Set flag that quiz has been attempted
+      document.exitFullscreen();
+      window.location.href = "/leaderboard";
+    } catch (error) {
+      console.error("❌ Quiz submission error:", error.response?.data || error.message);
+      alert(error.response?.data?.message || "Error submitting quiz");
+    }
+  };
+
+  // Timer countdown logic
+  useEffect(() => {
+    let interval;
+    if (quizStarted && !quizEnded) {
+      interval = setInterval(() => {
+        setTimeRemaining((prevTime) => {
+          if (prevTime <= 1) {
+            clearInterval(interval);
+            handleSubmit(); // Automatically submit the quiz when time runs out
+            return 0;
+          }
+          return prevTime - 1;
+        });
+      }, 1000);
+    }
+
+    return () => clearInterval(interval);
+  }, [quizStarted, quizEnded]);
+
+  // Format time in MM:SS format
+  const formatTime = (timeInSeconds) => {
+    const minutes = Math.floor(timeInSeconds / 60);
+    const seconds = timeInSeconds % 60;
+    return `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   };
 
   // Add a 10-second delay before starting the quiz
   const handleStartQuiz = () => {
-    setIsWaiting(true);  // Set the waiting state to true
-    enableFullScreen();
+    if (hasAttempted) {
+      alert("🚫 You've already attempted this quiz.");
+      window.location.href = "/login"; // Redirect to login if attempted
+    } else {
+      setIsWaiting(true);  // Set the waiting state to true
+      enableFullScreen();
 
-    // Trigger quiz start after 10 seconds
-    setTimeout(() => {
-      socket.emit("startQuiz");  // Trigger the same start function after 10 seconds
-      setIsWaiting(false);  // Reset waiting state after the delay
-      localStorage.setItem("quizStarted", "true");  // Store the state in localStorage
-    }, 10000);  // 10 seconds delay
+      // Wait for the admin to start the quiz
+      setTimeout(() => {
+        setIsWaiting(false);  // Reset waiting state after the delay
+        localStorage.setItem("quizStarted", "true");  // Store the state in localStorage
+      }, 10000);  // 10 seconds delay
+    }
   };
 
   return (
-    <div style={{ height: "100vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", backgroundColor: "#2D2D2D" }}>
+    <div style={{ width: "100vw", height: "100vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", backgroundColor: "#2D2D2D" }}>
+      {/* Timer at the top */}
+      <div style={{ position: "absolute", top: "20px", right: "20px", color: "white", fontSize: "24px" }}>
+        {!quizEnded && formatTime(timeRemaining)}
+      </div>
+
       {!quizStarted ? (
-        <button 
+        <button
           style={{
             backgroundColor: "#39FF14",
             color: "black",
@@ -100,7 +182,7 @@ function Quiz() {
       ) : (
         <div style={{ width: "75%", marginTop: "20px" }}>
           {quizEnded ? (
-            <h1 style={{ color: "red", textAlign: "center" }}>❌ Quiz Over! You exited fullscreen.</h1>
+            <h1 style={{ color: "red", textAlign: "center" }}>❌ Quiz Over! Time's up.</h1>
           ) : (
             questions.map((q, idx) => (
               <div key={q._id} style={{ backgroundColor: "#1A1A1A", padding: "20px", borderRadius: "8px", marginBottom: "10px" }}>
