@@ -14,7 +14,7 @@ const server = http.createServer(app);
 app.use(
   cors({
     origin: "https://quiz-app-xi-lac.vercel.app", // Your frontend URL
-    methods: ["GET", "POST"],
+    methods: "GET, POST",
     credentials: true,
   })
 );
@@ -23,7 +23,7 @@ app.use(
 const io = socketIo(server, {
   cors: {
     origin: "https://quiz-app-xi-lac.vercel.app", // Your frontend URL
-    methods: ["GET", "POST"],
+    methods: "GET, POST",
     credentials: true,
   },
 });
