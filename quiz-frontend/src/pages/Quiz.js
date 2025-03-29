@@ -16,7 +16,7 @@ function Quiz() {
   const [quizSubmitted, setQuizSubmitted] = useState(false);
   const [adminStarted, setAdminStarted] = useState(false);
   const [hasAttempted, setHasAttempted] = useState(false); // Track if user has already attempted
-  const [timeRemaining, setTimeRemaining] = useState(30 * 60); // Timer in seconds (30 minutes)
+  const [timeRemaining, setTimeRemaining] = useState(5); // Timer in seconds (30 minutes)
 
   // Full-screen mode function
   const enableFullScreen = () => {
