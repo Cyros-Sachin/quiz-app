@@ -13,12 +13,7 @@ const app = express();
 const server = http.createServer(app);
 
 // Proper CORS settings for Express
-app.use(cors({
-  origin: "https://quiz-app-xi-lac.vercel.app",
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true
-}));
+app.use(cors({ origin: "*" }));
 
 // Middleware
 app.use(express.json());
@@ -26,12 +21,9 @@ app.use(express.json());
 // Initialize Socket.io and force WebSockets (NO POLLING)
 const io = new Server(server, {
   cors: {
-    origin: "https://quiz-app-xi-lac.vercel.app",
-    methods: ["GET", "POST"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true
-  },
-  transports: ["websocket","polling"], // ✅ Force only WebSockets, NO POLLING
+      origin: "https://quiz-app.vercel.app", // Replace with your frontend URL
+      methods: ["GET", "POST"]
+  }
 });
 
 let quizStarted = false;
