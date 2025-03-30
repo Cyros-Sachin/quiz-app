@@ -106,9 +106,15 @@ function Quiz() {
   // Handle radio button answer selection (disabled if quiz ended)
   const handleAnswerChange = (questionId, selectedOption) => {
     if (!quizEnded) {
-      setAnswers({ ...answers, [questionId]: selectedOption });
+        setAnswers(prevAnswers => ({
+            ...prevAnswers,
+            [questionId]: selectedOption
+        }));
+
+        console.log("✅ Answer Selected:", questionId, selectedOption); // Debug log
     }
-  };
+};
+
 
   // Handle quiz submission
   const handleSubmit = async () => {
