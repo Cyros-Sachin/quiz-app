@@ -179,12 +179,15 @@ function Quiz() {
   // Timer countdown logic
   useEffect(() => {
     let interval;
-    if (quizStarted && !quizEnded) {
+    if (quizStarted && !quizEnded && !quizSubmitted) {
       interval = setInterval(() => {
         setTimeRemaining((prevTime) => {
           if (prevTime <= 1) {
             clearInterval(interval);
-            autoSubmit(); // Ensure this is called when time reaches 0
+            if (!quizSubmitted) {
+              console.log("⏳ Auto-submitting due to timeout...");
+              autoSubmit(); // Ensure auto-submit is triggered
+            }
             return 0;
           }
           return prevTime - 1;
@@ -237,7 +240,7 @@ function Quiz() {
         </div>) : (<div></div>)
       }
 
-      <div style={{ position: "absolute", top: "20px", right: "20px", color: "#00fffb", fontSize: "24px",fontWeight:"700" }}>
+      <div style={{ position: "absolute", top: "20px", right: "20px", color: "#00fffb", fontSize: "24px", fontWeight: "700" }}>
         {!quizEnded && formatTime(timeRemaining)}
       </div>
 
