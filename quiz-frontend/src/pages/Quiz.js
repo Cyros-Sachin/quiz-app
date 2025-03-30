@@ -136,8 +136,7 @@ function Quiz() {
     }
 
     // ✅ Using callback to get the latest answers state
-    const finalAnswers = { ...answers  };
-    console.log("📌 Final Answers at Submit:", finalAnswers); // Debugging log
+    const finalAnswers = { ...answers };
 
     if (Object.keys(finalAnswers).length === 0) {
       alert("❌ No answers selected! Please attempt at least one question.");
@@ -145,11 +144,6 @@ function Quiz() {
     }
 
     // ✅ Make sure submission happens only after getting latest state
-    submitQuiz(userId, finalAnswers);
-  };
-
-  // ✅ Separate function to handle the API call (keeps it clean)
-  const submitQuiz = async (userId, finalAnswers) => {
     try {
       const response = await axios.post("https://quiz-app-so3y.onrender.com/api/quiz/submit", { userId, answers: finalAnswers });
 
@@ -168,11 +162,6 @@ function Quiz() {
       alert("❌ Submission failed. Check console for details.");
     }
   };
-
-
-
-
-
 
   // Timer countdown logic
   useEffect(() => {
