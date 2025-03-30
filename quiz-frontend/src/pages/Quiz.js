@@ -19,7 +19,7 @@ function Quiz() {
   const [timeRemaining, setTimeRemaining] = useState(10); // Timer in seconds (10 sec for testing, change as needed)
   const [exitWarnings, setExitWarnings] = useState(0); // Track ESC warnings
   const [errorMessage, setErrorMessage] = useState("");
-
+  const [hasBlurred, setHasBlurred] = useState(false);
   // Full-screen mode function
   const enableFullScreen = () => {
     if (!document.fullscreenElement) {
@@ -44,14 +44,24 @@ function Quiz() {
 
 
   // Prevent user from switching tabs or minimizing window
+  const handleBlur = () => {
+    if (!hasBlurred && quizStarted && !quizEnded && !quizSubmitted) {
+      setHasBlurred(true);
+      setQuizEnded(true);
+      alert("🚫 You minimized the window! The quiz is now over.");
+    }
+  };
+  
+  // Debounced tab switch prevention (avoids multiple triggers)
   const preventTabSwitch = useCallback(() => {
-    if (document.hidden) {
-      if (!quizSubmitted) {
-        alert("🚫 You can't switch tabs or minimize the window during the quiz!");
-        setQuizEnded(true); // End quiz if user switches tabs
+    if (document.hidden && quizStarted && !quizEnded && !quizSubmitted) {
+      if (!hasBlurred) {
+        setHasBlurred(true);
+        setQuizEnded(true);
+        alert("🚫 You can't switch tabs! The quiz is over.");
       }
     }
-  }, [quizSubmitted]);
+  }, [quizStarted, quizEnded, quizSubmitted, hasBlurred]);
 
   // Disable all keyboard events
   const disableKeyboard = (event) => {
@@ -73,13 +83,6 @@ function Quiz() {
     }
   };
 
-  // Detect if user tries to minimize or switch tabs
-  const handleBlur = () => {
-    if (quizStarted && !quizEnded && !quizSubmitted) {
-      alert("🚫 You minimized the window! The quiz is now over.");
-      setQuizEnded(true);
-    }
-  };
 
   // Prevent right-click
   const preventContextMenu = (event) => {
