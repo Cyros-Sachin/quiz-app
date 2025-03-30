@@ -18,6 +18,7 @@ function Quiz() {
   const [quizSubmitted, setQuizSubmitted] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(10); // Timer in seconds (10 sec for testing, change as needed)
   const [exitWarnings, setExitWarnings] = useState(0); // Track ESC warnings
+  const [errorMessage, setErrorMessage] = useState("");
 
   // Full-screen mode function
   const enableFullScreen = () => {
@@ -136,7 +137,7 @@ function Quiz() {
     // 🔥 Fix: Ensure at least one answer is selected
     const answeredQuestions = Object.values(answers).filter(ans => ans !== "").length;
     if (answeredQuestions === 0) {
-      alert("❌ No answers selected! Please attempt at least one question.");
+      setErrorMessage("❌ No answers selected! Please attempt at least one question.");
       return;
     }
 
@@ -157,7 +158,7 @@ function Quiz() {
       console.error("❌ Quiz submission error:", error);
 
       if (error.response) {
-        alert(`Server Error: ${error.response.data?.message || "Something went wrong!"}`);
+        setErrorMessage(`Server Error: ${error.response?.data?.message || "Something went wrong!"}`);
       } else if (error.request) {
         alert("❌ No response from server. Check your internet connection.");
       } else {
@@ -212,6 +213,12 @@ function Quiz() {
       <div style={{ position: "absolute", top: "20px", right: "20px", color: "white", fontSize: "24px" }}>
         {!quizEnded && formatTime(timeRemaining)}
       </div>
+      {errorMessage && (
+        <div style={{ color: "red", backgroundColor: "black", padding: "10px", marginBottom: "10px" }}>
+          {errorMessage}
+        </div>
+      )}
+
 
       {!quizStarted ? (
         <button
