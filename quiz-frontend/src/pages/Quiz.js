@@ -8,8 +8,7 @@ const socket = io("https://quiz-app-so3y.onrender.com", {
 });
 
 function Quiz() {
-  const [adminStarted, setAdminStarted] = useState(false);
-  const [hasAttempted, setHasAttempted] = useState(false); // Track if user has already attempted
+  
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState({});
   const [quizStarted, setQuizStarted] = useState(false);
@@ -18,7 +17,6 @@ function Quiz() {
   const [quizSubmitted, setQuizSubmitted] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(10); // Timer in seconds (10 sec for testing, change as needed)
   const [exitWarnings, setExitWarnings] = useState(0); // Track ESC warnings
-  const [errorMessage, setErrorMessage] = useState("");
   const [hasBlurred, setHasBlurred] = useState(false);
   // Full-screen mode function
   const enableFullScreen = () => {
@@ -222,11 +220,7 @@ const submitQuiz = async (userId, finalAnswers) => {
       <div style={{ position: "absolute", top: "20px", right: "20px", color: "white", fontSize: "24px" }}>
         {!quizEnded && formatTime(timeRemaining)}
       </div>
-      {errorMessage && (
-        <div style={{ color: "red", backgroundColor: "black", padding: "10px", marginBottom: "10px" }}>
-          {errorMessage}
-        </div>
-      )}
+      
 
 
       {!quizStarted ? (
