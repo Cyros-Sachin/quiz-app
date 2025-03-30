@@ -130,37 +130,46 @@ function Quiz() {
 
     let userId = localStorage.getItem("userId");
     if (!userId || userId.length !== 24) {
-      alert("❌ Invalid User ID. Please log in again.");
-      return;
+        alert("❌ Invalid User ID. Please log in again.");
+        return;
     }
 
-    // ✅ Create a snapshot of answers (to avoid empty state issue)
-    const finalAnswers = { ...answers };
-    console.log("📌 Final Answers at Submit:", finalAnswers); // Debugging log
+    // ✅ Using callback to get the latest answers state
+    setAnswers((prevAnswers) => {
+        const finalAnswers = { ...prevAnswers };
+        console.log("📌 Final Answers at Submit:", finalAnswers); // Debugging log
 
-    if (Object.keys(finalAnswers).length === 0) {
-      alert("❌ No answers selected! Please attempt at least one question.");
-      return;
-    }
+        if (Object.keys(finalAnswers).length === 0) {
+            alert("❌ No answers selected! Please attempt at least one question.");
+            return;
+        }
 
+        // ✅ Make sure submission happens only after getting latest state
+        submitQuiz(userId, finalAnswers);
+    });
+};
+
+// ✅ Separate function to handle the API call (keeps it clean)
+const submitQuiz = async (userId, finalAnswers) => {
     try {
-      const response = await axios.post("https://quiz-app-so3y.onrender.com/api/quiz/submit", { userId, answers: finalAnswers });
+        const response = await axios.post("https://quiz-app-so3y.onrender.com/api/quiz/submit", { userId, answers: finalAnswers });
 
-      console.log("✅ Server Response:", response.data);
+        console.log("✅ Server Response:", response.data);
 
-      if (response.data && response.data.success) {
-        setQuizSubmitted(true);
-        localStorage.setItem("quizAttempted", "true");
-        document.exitFullscreen();
-        window.location.href = "/leaderboard";
-      } else {
-        alert("⚠️ Something went wrong, quiz was not submitted!");
-      }
+        if (response.data && response.data.success) {
+            setQuizSubmitted(true);
+            localStorage.setItem("quizAttempted", "true");
+            document.exitFullscreen();
+            window.location.href = "/leaderboard";
+        } else {
+            alert("⚠️ Something went wrong, quiz was not submitted!");
+        }
     } catch (error) {
-      console.error("❌ Quiz submission error:", error);
-      alert("❌ Submission failed. Check console for details.");
+        console.error("❌ Quiz submission error:", error);
+        alert("❌ Submission failed. Check console for details.");
     }
-  };
+};
+
 
 
 
