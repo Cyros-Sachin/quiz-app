@@ -34,7 +34,7 @@ function Dashboard() {
 
   return (
     <div className="bg-darkBg">
-      <h1 className="text-neon text-3xl mb-4">Admin Dashboard</h1>
+      <h1 className="text">Admin Dashboard</h1>
 
       <label htmlFor="toggle" style={{ display: "block", marginBottom: "10px", fontSize: "18px", color: "#39FF14" }}>
         {isQuizStarted ? "Quiz is currently running. Click to stop." : "Quiz is currently stopped. Click to start."}
