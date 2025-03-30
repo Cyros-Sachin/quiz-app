@@ -15,7 +15,7 @@ function Quiz() {
   const [quizEnded, setQuizEnded] = useState(false);
   const [isWaiting, setIsWaiting] = useState(false);
   const [quizSubmitted, setQuizSubmitted] = useState(false);
-  const [timeRemaining, setTimeRemaining] = useState(30 *60); // Timer in seconds (10 sec for testing, change as needed)
+  const [timeRemaining, setTimeRemaining] = useState(30 * 60); // Timer in seconds (10 sec for testing, change as needed)
   const [exitWarnings, setExitWarnings] = useState(0); // Track ESC warnings
   const [hasBlurred, setHasBlurred] = useState(false);
   // Full-screen mode function
@@ -136,16 +136,16 @@ function Quiz() {
     }
 
     // ✅ Using callback to get the latest answers state
-    const finalAnswers = { ...prevAnswers };
-      console.log("📌 Final Answers at Submit:", finalAnswers); // Debugging log
+    const finalAnswers = { ...answers  };
+    console.log("📌 Final Answers at Submit:", finalAnswers); // Debugging log
 
-      if (Object.keys(finalAnswers).length === 0) {
-        alert("❌ No answers selected! Please attempt at least one question.");
-        return;
-      }
+    if (Object.keys(finalAnswers).length === 0) {
+      alert("❌ No answers selected! Please attempt at least one question.");
+      return;
+    }
 
-      // ✅ Make sure submission happens only after getting latest state
-      submitQuiz(userId, finalAnswers);
+    // ✅ Make sure submission happens only after getting latest state
+    submitQuiz(userId, finalAnswers);
   };
 
   // ✅ Separate function to handle the API call (keeps it clean)
@@ -235,7 +235,7 @@ function Quiz() {
         </div>) : (<div></div>)
       }
 
-      <div style={{ position: "absolute", top: "20px", right: "20px", color: "#00fffb", fontSize: "24px",fontWeight:"700" }}>
+      <div style={{ position: "absolute", top: "20px", right: "20px", color: "#00fffb", fontSize: "24px", fontWeight: "700" }}>
         {!quizEnded && formatTime(timeRemaining)}
       </div>
 
