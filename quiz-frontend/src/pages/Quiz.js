@@ -1,4 +1,4 @@
-// Import necessary dependencies
+// Import React, useState, useEffect, useCallback
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { io } from "socket.io-client";
@@ -9,38 +9,23 @@ const socket = io("https://quiz-app-so3y.onrender.com", {
 });
 
 function Quiz() {
+  const [adminStarted, setAdminStarted] = useState(false);
+  const [hasAttempted, setHasAttempted] = useState(false);
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState({});
   const [quizStarted, setQuizStarted] = useState(false);
   const [quizEnded, setQuizEnded] = useState(false);
+  const [isWaiting, setIsWaiting] = useState(false);
   const [quizSubmitted, setQuizSubmitted] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(10);
+  const [exitWarnings, setExitWarnings] = useState(0);
 
-  useEffect(() => {
-    socket.on("quizStarted", () => {
-      setQuizStarted(true);
-    });
-
-    axios.get("https://quiz-app-so3y.onrender.com/api/questions").then((res) => {
-      setQuestions(res.data);
-    });
-
-    return () => {
-      socket.off("quizStarted");
-    };
-  }, []);
-
-  // Handle answer selection
-  const handleAnswerChange = (questionId, selectedOption) => {
-    if (!quizEnded) {
-      setAnswers((prevAnswers) => ({
-        ...prevAnswers,
-        [questionId]: selectedOption,
-      }));
+  const enableFullScreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(err => console.log("Fullscreen Error:", err));
     }
   };
 
-  // Handle auto-submit when time runs out
   const autoSubmit = async () => {
     if (!quizSubmitted) {
       setQuizSubmitted(true);
@@ -48,24 +33,62 @@ function Quiz() {
     }
   };
 
-  useEffect(() => {
-    let interval;
-    if (quizStarted && !quizEnded) {
-      interval = setInterval(() => {
-        setTimeRemaining((prevTime) => {
-          if (prevTime <= 1) {
-            clearInterval(interval);
-            autoSubmit();
-            return 0;
-          }
-          return prevTime - 1;
-        });
-      }, 1000);
+  const preventTabSwitch = useCallback(() => {
+    if (document.hidden) {
+      if (!quizSubmitted) {
+        alert("🚫 You can't switch tabs or minimize the window during the quiz!");
+        setQuizEnded(true);
+      }
     }
-    return () => clearInterval(interval);
-  }, [quizStarted, quizEnded]);
+  }, [quizSubmitted]);
 
-  // Handle quiz submission
+  const disableKeyboard = (event) => {
+    if (quizStarted && !quizEnded) {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setExitWarnings(prev => prev + 1);
+        if (exitWarnings >= 2) {
+          alert("❌ You tried to exit full screen multiple times! The quiz is over.");
+          setQuizEnded(true);
+        } else {
+          alert("⚠️ Warning: You cannot exit full screen during the quiz!");
+          enableFullScreen();
+        }
+      } else {
+        event.preventDefault();
+      }
+    }
+  };
+
+  useEffect(() => {
+    socket.on("quizStarted", () => {
+      enableFullScreen();
+      setQuizStarted(true);
+    });
+
+    axios.get("https://quiz-app-so3y.onrender.com/api/questions").then(res => {
+      setQuestions(res.data);
+    });
+
+    document.addEventListener("visibilitychange", preventTabSwitch);
+    window.addEventListener("keydown", disableKeyboard);
+
+    return () => {
+      document.removeEventListener("visibilitychange", preventTabSwitch);
+      window.removeEventListener("keydown", disableKeyboard);
+      socket.off("quizStarted");
+    };
+  }, [quizStarted, quizEnded, preventTabSwitch, exitWarnings]);
+
+  const handleAnswerChange = (questionId, selectedOption) => {
+    if (!quizEnded) {
+      setAnswers(prevAnswers => ({
+        ...prevAnswers,
+        [questionId]: selectedOption,
+      }));
+    }
+  };
+
   const handleSubmit = async () => {
     if (quizEnded || quizSubmitted) return;
     let userId = localStorage.getItem("userId");
@@ -74,10 +97,7 @@ function Quiz() {
       return;
     }
     try {
-      const response = await axios.post(
-        "https://quiz-app-so3y.onrender.com/api/quiz/submit",
-        { userId, answers }
-      );
+      const response = await axios.post("https://quiz-app-so3y.onrender.com/api/quiz/submit", { userId, answers });
       if (response.data?.success) {
         setQuizSubmitted(true);
         localStorage.setItem("quizAttempted", "true");
@@ -89,6 +109,23 @@ function Quiz() {
       alert("❌ Submission error. Try again!");
     }
   };
+
+  useEffect(() => {
+    let interval;
+    if (quizStarted && !quizEnded) {
+      interval = setInterval(() => {
+        setTimeRemaining(prevTime => {
+          if (prevTime <= 1) {
+            clearInterval(interval);
+            autoSubmit();
+            return 0;
+          }
+          return prevTime - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [quizStarted, quizEnded]);
 
   return (
     <div style={{ textAlign: "center", padding: "20px" }}>
