@@ -70,12 +70,10 @@ function Quiz() {
   // Detect if user tries to minimize or switch tabs
   const handleBlur = () => {
     if (quizStarted && !quizEnded && !quizSubmitted) {
-      alert("🚫 You minimized the window! Submitting your quiz...");
-      autoSubmit(); // Submit before marking quiz as ended
+      alert("🚫 You minimized the window! The quiz is now over.");
       setQuizEnded(true);
     }
   };
-  
 
   // Prevent right-click
   const preventContextMenu = (event) => {
