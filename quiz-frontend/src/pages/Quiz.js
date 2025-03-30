@@ -31,17 +31,14 @@ function Quiz() {
   // Auto-submit when timer ends
   const autoSubmit = async () => {
     if (!quizSubmitted) {
-      console.log("⏳ Auto-submitting, ensuring latest answers...");
-
+      alert("⏳ Time's up! Submitting your answers...");
       setQuizSubmitted(true); // Prevent multiple calls
 
-      // Delay slightly to make sure state updates properly
-      setTimeout(async () => {
-        console.log("📌 Final Answers at Submit:", answers); // Log final answers
-        await handleSubmit();
-      }, 500); // Delay of 500ms to ensure state sync
+      console.log("⏳ Auto-submitting, ensuring latest answers...");
+      await handleSubmit(); // Call submit function
     }
   };
+
 
 
 
@@ -133,21 +130,23 @@ function Quiz() {
 
     let userId = localStorage.getItem("userId");
     if (!userId || userId.length !== 24) {
-      setErrorMessage("❌ Invalid User ID. Please log in again.");
+      alert("❌ Invalid User ID. Please log in again.");
       return;
     }
 
-    console.log("📝 Answers Before Submit:", { ...answers }); // 🔍 Log answers before sending
+    // ✅ Create a snapshot of answers (to avoid empty state issue)
+    const finalAnswers = { ...answers };
+    console.log("📌 Final Answers at Submit:", finalAnswers); // Debugging log
 
-    if (Object.keys(answers).length === 0) {
-      setErrorMessage("❌ No answers selected! Please attempt at least one question.");
+    if (Object.keys(finalAnswers).length === 0) {
+      alert("❌ No answers selected! Please attempt at least one question.");
       return;
     }
 
     try {
-      const response = await axios.post("https://quiz-app-so3y.onrender.com/api/quiz/submit", { userId, answers });
+      const response = await axios.post("https://quiz-app-so3y.onrender.com/api/quiz/submit", { userId, answers: finalAnswers });
 
-      console.log("✅ Server Response:", response.data);  // Log response
+      console.log("✅ Server Response:", response.data);
 
       if (response.data && response.data.success) {
         setQuizSubmitted(true);
@@ -155,13 +154,14 @@ function Quiz() {
         document.exitFullscreen();
         window.location.href = "/leaderboard";
       } else {
-        setErrorMessage("⚠️ Something went wrong, quiz was not submitted!");
+        alert("⚠️ Something went wrong, quiz was not submitted!");
       }
     } catch (error) {
       console.error("❌ Quiz submission error:", error);
-      setErrorMessage(`Server Error: ${error.response?.data?.message || "Something went wrong!"}`);
+      alert("❌ Submission failed. Check console for details.");
     }
   };
+
 
 
 
