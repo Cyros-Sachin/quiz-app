@@ -19,23 +19,36 @@ function Quiz() {
   const [exitWarnings, setExitWarnings] = useState(0); // Track ESC warnings
   const [hasBlurred, setHasBlurred] = useState(false);
   // Full-screen mode function
-  const enableFullScreen = useCallback(() => {
+  const enableFullScreen = () => {
     if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(err => {
-        console.log("Fullscreen Error:", err);
-      });
+      document.documentElement.requestFullscreen()
+        .catch(err => console.log("Fullscreen Error:", err));
     }
-  }, []);
-  
+  };
+
+  // Auto-submit when timer ends
+  const autoSubmit = async () => {
+    if (!quizSubmitted) {
+      alert("⏳ Time's up! Submitting your answers...");
+      setQuizSubmitted(true); // Prevent multiple calls
+
+      console.log("⏳ Auto-submitting, ensuring latest answers...");
+      await handleSubmit(); // Call submit function
+    }
+  };
+
+
+
+
+
   // Prevent user from switching tabs or minimizing window
-  const handleBlur = useCallback(() => {
+  const handleBlur = () => {
     if (!hasBlurred && quizStarted && !quizEnded && !quizSubmitted) {
       setHasBlurred(true);
       setQuizEnded(true);
       alert("🚫 You minimized the window! The quiz is now over.");
     }
-  }, [hasBlurred, quizStarted, quizEnded, quizSubmitted]); // ✅ Added dependencies
-  
+  };
 
   // Debounced tab switch prevention (avoids multiple triggers)
   const preventTabSwitch = useCallback(() => {
@@ -49,24 +62,24 @@ function Quiz() {
   }, [quizStarted, quizEnded, quizSubmitted, hasBlurred]);
 
   // Disable all keyboard events
-  const disableKeyboard = useCallback((event) => {
+  const disableKeyboard = (event) => {
     if (quizStarted && !quizEnded) {
       if (event.key === "Escape") {
-        event.preventDefault();
+        event.preventDefault(); // Prevent ESC exit
         setExitWarnings((prev) => prev + 1);
+
         if (exitWarnings >= 2) {
           alert("❌ You tried to exit full screen multiple times! The quiz is over.");
           setQuizEnded(true);
         } else {
           alert("⚠️ Warning: You cannot exit full screen during the quiz!");
-          enableFullScreen();
+          enableFullScreen(); // Force full screen again
         }
       } else {
-        event.preventDefault();
+        event.preventDefault(); // Block other key inputs
       }
     }
-  }, [quizStarted, quizEnded, exitWarnings, enableFullScreen]); // ✅ Added dependencies
-  
+  };
 
 
   // Prevent right-click
@@ -97,7 +110,7 @@ function Quiz() {
       window.removeEventListener("blur", handleBlur);
       socket.off("quizStarted");
     };
-  }, [quizStarted, quizEnded, preventTabSwitch, handleBlur, exitWarnings,disableKeyboard,enableFullScreen]);
+  }, [quizStarted, quizEnded, preventTabSwitch, handleBlur, exitWarnings]);
 
   // Handle radio button answer selection (disabled if quiz ended)
   const handleAnswerChange = (questionId, selectedOption) => {
@@ -113,7 +126,7 @@ function Quiz() {
 
 
   // Handle quiz submission
-  const handleSubmit = (async () => {
+  const handleSubmit = async () => {
     if (quizEnded || quizSubmitted) return; // Prevent multiple submissions
 
     let userId = localStorage.getItem("userId");
@@ -135,7 +148,7 @@ function Quiz() {
       // ✅ Make sure submission happens only after getting latest state
       submitQuiz(userId, finalAnswers);
     });
-  }, [quizEnded, quizSubmitted, answers]);
+  };
 
   // ✅ Separate function to handle the API call (keeps it clean)
   const submitQuiz = async (userId, finalAnswers) => {
@@ -161,15 +174,7 @@ function Quiz() {
     }
   };
 
-  // Auto-submit when timer ends
-  const autoSubmit = useCallback(async () => {
-    if (!quizSubmitted) {
-      alert("⏳ Time's up! Submitting your answers...");
-      setQuizSubmitted(true);
-      console.log("⏳ Auto-submitting, ensuring latest answers...");
-      await handleSubmit();
-    }
-  }, [quizSubmitted, handleSubmit]); // ✅ Added dependencies
+
 
 
 
@@ -194,7 +199,7 @@ function Quiz() {
     }
 
     return () => clearInterval(interval);
-  }, [quizStarted, quizEnded, quizSubmitted,autoSubmit]); // Added quizSubmitted to dependencies
+  }, [quizStarted, quizEnded, quizSubmitted]); // Added quizSubmitted to dependencies
 
 
   // Format time in MM:SS format
