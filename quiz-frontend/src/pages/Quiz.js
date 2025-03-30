@@ -157,7 +157,7 @@ function Quiz() {
 
       console.log("✅ Server Response:", response.data);
 
-      if (response.data?.success === true) {
+      if (response.data?.success === true || response.data?.includes("✅ Quiz submitted successfully")) {
         setQuizSubmitted(true);
         localStorage.setItem("quizAttempted", "true");
         document.exitFullscreen();
