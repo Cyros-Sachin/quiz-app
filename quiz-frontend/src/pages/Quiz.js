@@ -70,7 +70,6 @@ function Quiz() {
     if (quizStarted && !quizEnded && !quizSubmitted) {
       alert("🚫 You minimized the window! The quiz is now over.");
       setQuizEnded(true);
-      window.location.href('/');
     }
   };
 
@@ -81,8 +80,8 @@ function Quiz() {
 
   useEffect(() => {
     socket.on("quizStarted", () => {
-      setQuizStarted(true);
       enableFullScreen(); // Trigger fullscreen when quiz starts
+      setQuizStarted(true);
     });
 
     // Fetch questions from the backend
