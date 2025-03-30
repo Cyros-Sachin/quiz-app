@@ -31,12 +31,18 @@ function Quiz() {
   // Auto-submit when timer ends
   const autoSubmit = async () => {
     if (!quizSubmitted) {
-      console.log("⏳ Auto-submitting with answers:", answers);
-      alert("⏳ Time's up! Submitting your answers...");
-      setQuizSubmitted(true); // Set this first to prevent multiple calls
-      await handleSubmit(); // Call submit function
+      console.log("⏳ Auto-submitting, ensuring latest answers...");
+
+      setQuizSubmitted(true); // Prevent multiple calls
+
+      // Delay slightly to make sure state updates properly
+      setTimeout(async () => {
+        console.log("📌 Final Answers at Submit:", answers); // Log final answers
+        await handleSubmit();
+      }, 500); // Delay of 500ms to ensure state sync
     }
   };
+
 
 
 
@@ -131,7 +137,7 @@ function Quiz() {
       return;
     }
 
-    console.log("📝 Answers Before Submit:", answers); // 🔍 Log answers before sending
+    console.log("📝 Answers Before Submit:", { ...answers }); // 🔍 Log answers before sending
 
     if (Object.keys(answers).length === 0) {
       setErrorMessage("❌ No answers selected! Please attempt at least one question.");
