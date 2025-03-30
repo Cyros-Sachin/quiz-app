@@ -31,9 +31,11 @@ function Quiz() {
   const autoSubmit = async () => {
     if (!quizSubmitted) {
       alert("⏳ Time's up! Submitting your answers...");
+      setQuizSubmitted(true); // Set this first to prevent multiple calls
       await handleSubmit(); // Call submit function
     }
   };
+  
 
   // Prevent user from switching tabs or minimizing window
   const preventTabSwitch = useCallback(() => {
@@ -170,16 +172,17 @@ function Quiz() {
         setTimeRemaining((prevTime) => {
           if (prevTime <= 1) {
             clearInterval(interval);
-            autoSubmit(); // Auto-submit when time runs out
+            autoSubmit(); // Ensure this is called when time reaches 0
             return 0;
           }
           return prevTime - 1;
         });
       }, 1000);
     }
-
+  
     return () => clearInterval(interval);
-  }, [quizStarted, quizEnded]);
+  }, [quizStarted, quizEnded, quizSubmitted]); // Added quizSubmitted to dependencies
+  
 
   // Format time in MM:SS format
   const formatTime = (timeInSeconds) => {
