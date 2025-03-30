@@ -5,26 +5,6 @@ const User = require("../models/User");
 
 const router = express.Router();
 
-// Register route
-router.post("/register", async (req, res) => {
-  const { name, email, password, role } = req.body;
-
-  // Check if the user already exists
-  const existingUser = await User.findOne({ email });
-  if (existingUser) {
-    return res.status(400).send("User with this email already exists.");
-  }
-
-  const hashedPassword = await bcrypt.hash(password, 10);
-  const user = new User({ name, email, password: hashedPassword, role });
-
-  try {
-    await user.save();
-    res.status(201).send("User registered successfully.");
-  } catch (error) {
-    res.status(500).send("Error registering user: " + error.message);
-  }
-});
 
 // Login route
 router.post("/login", async (req, res) => {

@@ -8,14 +8,14 @@ const socket = io("https://quiz-app-so3y.onrender.com", {
 });
 
 function Quiz() {
-  
+
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState({});
   const [quizStarted, setQuizStarted] = useState(false);
   const [quizEnded, setQuizEnded] = useState(false);
   const [isWaiting, setIsWaiting] = useState(false);
   const [quizSubmitted, setQuizSubmitted] = useState(false);
-  const [timeRemaining, setTimeRemaining] = useState(10); // Timer in seconds (10 sec for testing, change as needed)
+  const [timeRemaining, setTimeRemaining] = useState(30 *60); // Timer in seconds (10 sec for testing, change as needed)
   const [exitWarnings, setExitWarnings] = useState(0); // Track ESC warnings
   const [hasBlurred, setHasBlurred] = useState(false);
   // Full-screen mode function
@@ -49,7 +49,7 @@ function Quiz() {
       alert("🚫 You minimized the window! The quiz is now over.");
     }
   };
-  
+
   // Debounced tab switch prevention (avoids multiple triggers)
   const preventTabSwitch = useCallback(() => {
     if (document.hidden && quizStarted && !quizEnded && !quizSubmitted) {
@@ -131,45 +131,45 @@ function Quiz() {
 
     let userId = localStorage.getItem("userId");
     if (!userId || userId.length !== 24) {
-        alert("❌ Invalid User ID. Please log in again.");
-        return;
+      alert("❌ Invalid User ID. Please log in again.");
+      return;
     }
 
     // ✅ Using callback to get the latest answers state
     setAnswers((prevAnswers) => {
-        const finalAnswers = { ...prevAnswers };
-        console.log("📌 Final Answers at Submit:", finalAnswers); // Debugging log
+      const finalAnswers = { ...prevAnswers };
+      console.log("📌 Final Answers at Submit:", finalAnswers); // Debugging log
 
-        if (Object.keys(finalAnswers).length === 0) {
-            alert("❌ No answers selected! Please attempt at least one question.");
-            return;
-        }
+      if (Object.keys(finalAnswers).length === 0) {
+        alert("❌ No answers selected! Please attempt at least one question.");
+        return;
+      }
 
-        // ✅ Make sure submission happens only after getting latest state
-        submitQuiz(userId, finalAnswers);
+      // ✅ Make sure submission happens only after getting latest state
+      submitQuiz(userId, finalAnswers);
     });
-};
+  };
 
-// ✅ Separate function to handle the API call (keeps it clean)
-const submitQuiz = async (userId, finalAnswers) => {
+  // ✅ Separate function to handle the API call (keeps it clean)
+  const submitQuiz = async (userId, finalAnswers) => {
     try {
-        const response = await axios.post("https://quiz-app-so3y.onrender.com/api/quiz/submit", { userId, answers: finalAnswers });
+      const response = await axios.post("https://quiz-app-so3y.onrender.com/api/quiz/submit", { userId, answers: finalAnswers });
 
-        console.log("✅ Server Response:", response.data);
+      console.log("✅ Server Response:", response.data);
 
-        if (response.data && response.data.success) {
-            setQuizSubmitted(true);
-            localStorage.setItem("quizAttempted", "true");
-            document.exitFullscreen();
-            window.location.href = "/leaderboard";
-        } else {
-            alert("⚠️ Something went wrong, quiz was not submitted!");
-        }
+      if (response.data && response.data.success) {
+        setQuizSubmitted(true);
+        localStorage.setItem("quizAttempted", "true");
+        document.exitFullscreen();
+        window.location.href = "/leaderboard";
+      } else {
+        alert("⚠️ Something went wrong, quiz was not submitted!");
+      }
     } catch (error) {
-        console.error("❌ Quiz submission error:", error);
-        alert("❌ Submission failed. Check console for details.");
+      console.error("❌ Quiz submission error:", error);
+      alert("❌ Submission failed. Check console for details.");
     }
-};
+  };
 
 
 
@@ -216,27 +216,40 @@ const submitQuiz = async (userId, finalAnswers) => {
 
   return (
     <div style={{ width: "100vw", height: "100vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", backgroundColor: "#2D2D2D" }}>
-      {/* Timer at the top */}
-      <div style={{ position: "absolute", top: "20px", right: "20px", color: "white", fontSize: "24px" }}>
+      {!quizStarted ?
+        (<div aria-label="Orange and tan hamster running in a metal wheel" role="img" className="wheel-and-hamster">
+          <div className="wheel" />
+          <div className="hamster">
+            <div className="hamster__body">
+              <div className="hamster__head">
+                <div className="hamster__ear" />
+                <div className="hamster__eye" />
+                <div className="hamster__nose" />
+              </div>
+              <div className="hamster__limb hamster__limb--fr" />
+              <div className="hamster__limb hamster__limb--fl" />
+              <div className="hamster__limb hamster__limb--br" />
+              <div className="hamster__limb hamster__limb--bl" />
+              <div className="hamster__tail" />
+            </div>
+          </div>
+          <div className="spoke" />
+        </div>) : (<div></div>)
+      }
+
+      <div style={{ position: "absolute", top: "20px", right: "20px", color: "#00fffb", fontSize: "24px",fontWeight:"700" }}>
         {!quizEnded && formatTime(timeRemaining)}
       </div>
-      
+
 
 
       {!quizStarted ? (
-        <button
-          style={{
-            backgroundColor: "#39FF14",
-            color: "black",
-            padding: "12px 20px",
-            fontSize: "18px",
-            borderRadius: "8px",
-            cursor: isWaiting ? "not-allowed" : "pointer"
-          }}
+        <button className="button" style={{
+          cursor: isWaiting ? "not-allowed" : "pointer"
+        }}
           onClick={handleStartQuiz}
-          disabled={isWaiting}
-        >
-          {isWaiting ? "Please wait..." : "Start Quiz"}
+          disabled={isWaiting}>
+          <span>{isWaiting ? "Please wait..." : "Start Quiz"}</span>
         </button>
       ) : (
         <div style={{ width: "75%", marginTop: "20px" }}>
@@ -248,7 +261,7 @@ const submitQuiz = async (userId, finalAnswers) => {
                 <h2 style={{ color: "#39FF14" }}>{idx + 1}. {q.question}</h2>
                 {q.options.map((opt, i) => (
                   <div key={i} style={{ display: "flex", alignItems: "center" }}>
-                    <input type="radio" name={q._id} value={opt} checked={answers[q._id] === opt} onChange={() => handleAnswerChange(q._id, opt)} disabled={quizEnded} style={{ marginRight: "10px" }} />
+                    <input className="radio" type="radio" name={q._id} value={opt} checked={answers[q._id] === opt} onChange={() => handleAnswerChange(q._id, opt)} disabled={quizEnded} style={{ marginRight: "10px" }} />
                     <label style={{ color: "white" }}>{opt}</label>
                   </div>
                 ))}
