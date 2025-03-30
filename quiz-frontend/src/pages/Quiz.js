@@ -112,19 +112,22 @@ function Quiz() {
 
   // Handle quiz submission
   const handleSubmit = async () => {
-    if (quizEnded || quizSubmitted) return;
+    if (quizEnded) return; // Only prevent submission if quiz is already ended
 
     let userId = localStorage.getItem("userId");
     console.log("📢 User ID before submitting:", userId); // Debugging log
+
     if (!userId || userId.length !== 24) {
       alert("❌ Invalid User ID. Please log in again.");
       return;
     }
 
+    console.log("📝 Submitted Answers:", answers);  // Log submitted answers
+
     try {
       await axios.post("https://quiz-app-so3y.onrender.com/api/quiz/submit", { userId, answers });
       setQuizSubmitted(true);
-      localStorage.setItem("quizAttempted", "true");  // Set flag that quiz has been attempted
+      localStorage.setItem("quizAttempted", "true");  // Mark quiz as attempted
       document.exitFullscreen();
       window.location.href = "/leaderboard";
     } catch (error) {
