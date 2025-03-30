@@ -15,7 +15,7 @@ function Quiz() {
   const [quizEnded, setQuizEnded] = useState(false);
   const [isWaiting, setIsWaiting] = useState(false);
   const [quizSubmitted, setQuizSubmitted] = useState(false);
-  const [timeRemaining, setTimeRemaining] = useState(30 * 60); // Timer in seconds (10 sec for testing, change as needed)
+  const [timeRemaining, setTimeRemaining] = useState(10); // Timer in seconds (10 sec for testing, change as needed)
   const [exitWarnings, setExitWarnings] = useState(0); // Track ESC warnings
   const [hasBlurred, setHasBlurred] = useState(false);
   // Full-screen mode function
@@ -136,20 +136,28 @@ function Quiz() {
     }
 
     // ✅ Using callback to get the latest answers state
-    const finalAnswers = { ...answers };
+    setAnswers((prevAnswers) => {
+      const finalAnswers = { ...prevAnswers };
+      console.log("📌 Final Answers at Submit:", finalAnswers); // Debugging log
 
-    if (Object.keys(finalAnswers).length === 0) {
-      alert("❌ No answers selected! Please attempt at least one question.");
-      return;
-    }
+      if (Object.keys(finalAnswers).length === 0) {
+        alert("❌ No answers selected! Please attempt at least one question.");
+        return;
+      }
 
-    // ✅ Make sure submission happens only after getting latest state
+      // ✅ Make sure submission happens only after getting latest state
+      submitQuiz(userId, finalAnswers);
+    });
+  };
+
+  // ✅ Separate function to handle the API call (keeps it clean)
+  const submitQuiz = async (userId, finalAnswers) => {
     try {
       const response = await axios.post("https://quiz-app-so3y.onrender.com/api/quiz/submit", { userId, answers: finalAnswers });
 
       console.log("✅ Server Response:", response.data);
 
-      if (response.data?.success) {
+      if (response.data && response.data.success) {
         setQuizSubmitted(true);
         localStorage.setItem("quizAttempted", "true");
         document.exitFullscreen();
@@ -162,6 +170,11 @@ function Quiz() {
       alert("❌ Submission failed. Check console for details.");
     }
   };
+
+
+
+
+
 
   // Timer countdown logic
   useEffect(() => {
@@ -224,7 +237,7 @@ function Quiz() {
         </div>) : (<div></div>)
       }
 
-      <div style={{ position: "absolute", top: "20px", right: "20px", color: "#00fffb", fontSize: "24px", fontWeight: "700" }}>
+      <div style={{ position: "absolute", top: "20px", right: "20px", color: "#00fffb", fontSize: "24px",fontWeight:"700" }}>
         {!quizEnded && formatTime(timeRemaining)}
       </div>
 
