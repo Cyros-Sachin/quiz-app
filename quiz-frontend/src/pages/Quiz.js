@@ -112,29 +112,49 @@ function Quiz() {
 
   // Handle quiz submission
   const handleSubmit = async () => {
-    if (quizEnded) return; // Only prevent submission if quiz is already ended
+    if (quizEnded || quizSubmitted) return; // Prevent multiple submissions
 
     let userId = localStorage.getItem("userId");
-    console.log("📢 User ID before submitting:", userId); // Debugging log
-
     if (!userId || userId.length !== 24) {
       alert("❌ Invalid User ID. Please log in again.");
       return;
     }
 
-    console.log("📝 Submitted Answers:", answers);  // Log submitted answers
+    // 🛠 Log collected answers before sending
+    console.log("📝 Submitted Answers:", answers);
+
+    if (Object.keys(answers).length === 0) {
+      alert("❌ No answers selected! Please attempt at least one question.");
+      return;
+    }
 
     try {
-      await axios.post("https://quiz-app-so3y.onrender.com/api/quiz/submit", { userId, answers });
-      setQuizSubmitted(true);
-      localStorage.setItem("quizAttempted", "true");  // Mark quiz as attempted
-      document.exitFullscreen();
-      window.location.href = "/leaderboard";
+      const response = await axios.post("https://quiz-app-so3y.onrender.com/api/quiz/submit", { userId, answers });
+
+      console.log("✅ Server Response:", response.data);  // Log response
+
+      if (response.data && response.data.success) {
+        setQuizSubmitted(true);
+        localStorage.setItem("quizAttempted", "true");
+        document.exitFullscreen();
+        window.location.href = "/leaderboard";
+      } else {
+        alert("⚠️ Something went wrong, quiz was not submitted!");
+      }
     } catch (error) {
-      console.error("❌ Quiz submission error:", error.response?.data || error.message);
-      alert(error.response?.data?.message || "Error submitting quiz");
+      console.error("❌ Quiz submission error:", error);
+
+      // Display error message properly
+      if (error.response) {
+        alert(`Server Error: ${error.response.data?.message || "Something went wrong!"}`);
+      } else if (error.request) {
+        alert("❌ No response from server. Check your internet connection.");
+      } else {
+        alert("❌ Something went wrong while submitting.");
+      }
     }
   };
+
 
   // Timer countdown logic
   useEffect(() => {
