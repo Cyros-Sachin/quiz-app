@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 const http = require("http");
 const { Server } = require("socket.io");
 const authRoutes = require("./routes/authRoutes");
-const questionRoutes = require("./routes/questionRoutes");
+
 const quizRoutes = require("./routes/quizRoutes");
 const { mongoURI } = require("./config");
 
@@ -63,7 +63,7 @@ if (quizRoutes.setIo) {
 
 // Routes
 app.use("/api/auth", authRoutes);
-app.use("/api/questions", questionRoutes);
+
 app.use("/api/quiz", quizRoutes);
 
 // Start the server

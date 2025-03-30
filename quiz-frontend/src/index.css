@@ -545,118 +545,207 @@ button[type="submit"]:hover {
   background: #ff00c5;
 }
 
-/* Normal CSS for styling the leaderboard */
-/* Leaderboard Container */
+/* 🌌 Ultimate Futuristic Leaderboard */
 .leader-container {
-  padding: 2rem 4rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: #121212;
-  color: white;
-  height: 100vh;
   justify-content: center;
   text-align: center;
-  overflow-y: auto;
-}
-
-/* Heading */
-.leader-container h1 {
-  font-size: 3rem;
-  color: #39ff14;  /* Neon green color */
-  margin-top: 5rem;
-  text-shadow: 0 0 15px rgba(57, 255, 20, 0.9), 0 0 30px rgba(57, 255, 20, 0.7); /* Glowing effect */
-  text-transform: uppercase;
-  letter-spacing: 2px;
-}
-
-/* Table Layout */
-table {
-  width: 90%; /* Increased width for better readability */
-  margin-top: 3rem;
-  border-collapse: collapse;
-  border-radius: 12px; /* Rounded corners */
+  min-height: 100vh;
+  background: radial-gradient(circle, #0f0f0f 40%, #050505 100%);
+  color: white;
+  padding: 3rem;
   overflow: hidden;
-  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.2); /* Subtle shadow for table */
+  position: relative;
 }
 
-/* Table Headers */
+/* ✨ Neon Glow Title */
+.leader-container h1 {
+  font-size: 4rem;
+  color: #39ff14;
+  margin-bottom: 2rem;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  text-shadow: 0 0 25px rgba(57, 255, 20, 1), 0 0 50px rgba(57, 255, 20, 0.9);
+  animation: neonGlow 1.5s infinite alternate ease-in-out;
+}
+
+/* 🎆 Animated Glow */
+@keyframes neonGlow {
+  0% {
+    text-shadow: 0 0 15px rgba(57, 255, 20, 1), 0 0 30px rgba(57, 255, 20, 0.8);
+  }
+  100% {
+    text-shadow: 0 0 35px rgba(57, 255, 20, 1), 0 0 70px rgba(57, 255, 20, 0.9);
+  }
+}
+
+/* 🔥 Glowing Table Wrapper */
+.table-wrapper {
+  width: 90%;
+  max-height: 65vh;
+  overflow-y: auto;
+  padding: 1.5rem;
+  background: rgba(20, 20, 20, 0.95);
+  backdrop-filter: blur(15px);
+  border-radius: 15px;
+  box-shadow: 0px 0px 30px rgba(0, 255, 100, 0.6);
+  border: 2px solid rgba(0, 255, 100, 0.3);
+  animation: pulseGlow 3s infinite alternate;
+}
+
+/* 🔄 Pulse Glow */
+@keyframes pulseGlow {
+  0% {
+    box-shadow: 0px 0px 20px rgba(0, 255, 100, 0.4);
+  }
+  100% {
+    box-shadow: 0px 0px 40px rgba(0, 255, 100, 0.8);
+  }
+}
+
+/* 🏆 Leaderboard Table */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  transition: transform 0.3s ease-in-out;
+}
+
+/* 🌟 Table Headers */
 table th {
   padding: 1.5rem;
-  background-color: #1a1a1a;
-  color: #39ff14; /* Neon green header */
-  font-size: 1.2rem;
-  text-align: center;
-  font-weight: bold;
+  background: linear-gradient(90deg, #111, #222);
+  color: #39ff14;
+  font-size: 1.5rem;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  box-shadow: 0px 2px 10px rgba(0, 255, 100, 0.6); /* Soft neon glow effect */
+  letter-spacing: 1.5px;
+  text-align: center;
+  box-shadow: 0px 2px 15px rgba(0, 255, 100, 0.6);
+  border-bottom: 2px solid rgba(57, 255, 20, 0.8);
 }
 
-/* Table Rows */
+/* 🎭 Alternating Rows */
 table tr:nth-child(even) {
-  background-color: #222;  /* Darker row color */
+  background: rgba(34, 34, 34, 0.9);
 }
 
 table tr:nth-child(odd) {
-  background-color: #1a1a1a; /* Slightly lighter background for odd rows */
+  background: rgba(26, 26, 26, 0.9);
 }
 
+/* 🎯 Hover Effect */
 table tr:hover {
-  background-color: #333;
+  background: rgba(57, 255, 20, 0.15);
   cursor: pointer;
-  transform: translateY(-3px); /* Slight lift effect on hover */
-  transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth hover transition */
+  transform: scale(1.03);
+  transition: all 0.3s ease-in-out;
 }
 
-/* Table Data */
+/* 📜 Table Data */
 table td {
-  padding: 1.2rem;
+  padding: 1rem;
   color: #ddd;
   text-align: left;
-  font-size: 1rem;
-  border-bottom: 1px solid #333;
+  font-size: 1.2rem;
+  border-bottom: 1px solid rgba(57, 255, 20, 0.3);
 }
 
-/* Bold First Column */
+/* 🏅 Rank Column */
 table td:first-child {
   font-weight: bold;
-  color: #39ff14; /* Neon green for the first column (Rank) */
+  color: #39ff14;
+  text-shadow: 0 0 15px rgba(57, 255, 20, 1);
 }
 
-/* Neon Green Glow Effect on Hover */
+/* 🔄 Neon Glow Hover */
 table td:hover {
   color: #39ff14;
-  text-shadow: 0 0 10px rgba(57, 255, 20, 0.8); /* Subtle neon glow effect on hover */
+  text-shadow: 0 0 20px rgba(57, 255, 20, 1);
 }
 
-/* Loading/Error Text */
-.text-red-500 {
-  color: #ff4040;
-  font-weight: bold;
-}
-
-.text-neon {
-  color: #00ffff;
-  font-weight: bold;
-}
-
-/* Neon Pulse Animation for Loading */
-@keyframes pulse {
+/* 🏆 Leaderboard Trophy Animation */
+@keyframes floating {
   0% {
-    opacity: 1;
+    transform: translateY(0px);
   }
   50% {
-    opacity: 0.7;
+    transform: translateY(10px);
   }
   100% {
-    opacity: 1;
+    transform: translateY(0px);
   }
 }
 
-.text-neon.loading {
-  font-size: 1.5rem;
-  animation: pulse 1.5s infinite;
+.trophy {
+  font-size: 3rem;
+  color: gold;
+  text-shadow: 0 0 20px rgba(255, 223, 0, 0.8);
+  animation: floating 3s infinite ease-in-out;
+}
+
+/* 🎚️ Custom Scrollbar */
+.table-wrapper::-webkit-scrollbar {
+  width: 12px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #39ff14, #00ff99);
+  border-radius: 10px;
+}
+
+.table-wrapper::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+
+/* 🔄 Smooth Hover Transitions */
+.table-wrapper:hover {
+  box-shadow: 0px 0px 50px rgba(0, 255, 100, 0.7);
+  transition: box-shadow 0.4s ease-in-out;
+}
+.but {
+  width: 10em;
+  position: relative;
+  height: 3.5em;
+  border: 3px ridge #149CEA;
+  outline: none;
+  background-color: transparent;
+  color: white;
+  transition: 1s;
+  border-radius: 0.3em;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.but::after {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: 3%;
+  width: 95%;
+  height: 40%;
+  transition: 0.5s;
+  transform-origin: center;
+}
+
+.but::before {
+  content: "";
+  transform-origin: center;
+  position: absolute;
+  top: 80%;
+  left: 3%;
+  width: 95%;
+  height: 40%;
+  transition: 0.5s;
+}
+
+.but:hover::before, .but:hover::after {
+  transform: scale(0)
+}
+
+.but:hover {
+  box-shadow: inset 0px 0px 25px #1479EA;
 }
 .radio {
   -webkit-appearance: none;

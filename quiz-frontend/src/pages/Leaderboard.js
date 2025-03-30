@@ -36,8 +36,9 @@ function Leaderboard() {
 
   return (
     <div className="leader-container">
-      <h1>Leaderboard</h1>
-
+      <div class="trophy">🏆</div>
+      <h1 className="leader-text">Leaderboard</h1>
+      
       {loading ? (
         <div>Loading...</div>
       ) : error ? (
