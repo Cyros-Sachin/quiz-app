@@ -8,21 +8,30 @@ const socket = io("https://quiz-app-so3y.onrender.com", {
 });
 
 function Quiz() {
+  const [adminStarted, setAdminStarted] = useState(false);
+  const [hasAttempted, setHasAttempted] = useState(false); // Track if user has already attempted
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState({});
   const [quizStarted, setQuizStarted] = useState(false);
   const [quizEnded, setQuizEnded] = useState(false);
   const [isWaiting, setIsWaiting] = useState(false);
   const [quizSubmitted, setQuizSubmitted] = useState(false);
-  const [adminStarted, setAdminStarted] = useState(false);
-  const [hasAttempted, setHasAttempted] = useState(false); // Track if user has already attempted
-  const [timeRemaining, setTimeRemaining] = useState(10); // Timer in seconds (30 minutes)
+  const [timeRemaining, setTimeRemaining] = useState(10); // Timer in seconds (10 sec for testing, change as needed)
+  const [exitWarnings, setExitWarnings] = useState(0); // Track ESC warnings
 
   // Full-screen mode function
   const enableFullScreen = () => {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen()
         .catch(err => console.log("Fullscreen Error:", err));
+    }
+  };
+
+  // Auto-submit when timer ends
+  const autoSubmit = async () => {
+    if (!quizSubmitted) {
+      alert("⏳ Time's up! Submitting your answers...");
+      await handleSubmit(); // Call submit function
     }
   };
 
@@ -34,30 +43,42 @@ function Quiz() {
         setQuizEnded(true); // End quiz if user switches tabs
       }
     }
-  }, []);
+  }, [quizSubmitted]);
 
   // Disable all keyboard events
   const disableKeyboard = (event) => {
     if (quizStarted && !quizEnded) {
-      event.preventDefault();  // Prevent all keyboard input during the quiz
+      if (event.key === "Escape") {
+        event.preventDefault(); // Prevent ESC exit
+        setExitWarnings((prev) => prev + 1);
+
+        if (exitWarnings >= 2) {
+          alert("❌ You tried to exit full screen multiple times! The quiz is over.");
+          setQuizEnded(true);
+        } else {
+          alert("⚠️ Warning: You cannot exit full screen during the quiz!");
+          enableFullScreen(); // Force full screen again
+        }
+      } else {
+        event.preventDefault(); // Block other key inputs
+      }
     }
   };
 
   // Detect if user tries to minimize or switch tabs
   const handleBlur = () => {
-    if (quizStarted && !quizEnded) {
-      if(!quizSubmitted){alert("🚫 You minimized the window! The quiz is now over.");
-      setQuizEnded(true);  // End the quiz if window loses focus
-      }
+    if (quizStarted && !quizEnded && !quizSubmitted) {
+      alert("🚫 You minimized the window! The quiz is now over.");
+      setQuizEnded(true);
     }
   };
 
+  // Prevent right-click
   const preventContextMenu = (event) => {
     event.preventDefault();
   };
 
   useEffect(() => {
-
     socket.on("quizStarted", () => {
       setQuizStarted(true);
       enableFullScreen(); // Trigger fullscreen when quiz starts
@@ -68,20 +89,19 @@ function Quiz() {
       setQuestions(res.data);
     });
 
-    // Prevent right-click (context menu)
     document.addEventListener("contextmenu", preventContextMenu);
     window.addEventListener("keydown", disableKeyboard);
-    document.addEventListener("visibilitychange", preventTabSwitch);  // Detect tab switches
-    window.addEventListener("blur", handleBlur);  // Detect if window loses focus
+    document.addEventListener("visibilitychange", preventTabSwitch);
+    window.addEventListener("blur", handleBlur);
 
     return () => {
       document.removeEventListener("contextmenu", preventContextMenu);
       window.removeEventListener("keydown", disableKeyboard);
       document.removeEventListener("visibilitychange", preventTabSwitch);
-      window.removeEventListener("blur", handleBlur);  // Remove event listeners when component unmounts
+      window.removeEventListener("blur", handleBlur);
       socket.off("quizStarted");
     };
-  }, [quizStarted, quizEnded, preventTabSwitch, handleBlur]);
+  }, [quizStarted, quizEnded, preventTabSwitch, handleBlur, exitWarnings]);
 
   // Handle radio button answer selection (disabled if quiz ended)
   const handleAnswerChange = (questionId, selectedOption) => {
@@ -90,9 +110,9 @@ function Quiz() {
     }
   };
 
-  // Handle quiz submission (disabled if quiz ended)
+  // Handle quiz submission
   const handleSubmit = async () => {
-    if (quizEnded) return;
+    if (quizEnded || quizSubmitted) return;
 
     let userId = localStorage.getItem("userId");
     console.log("📢 User ID before submitting:", userId); // Debugging log
@@ -121,7 +141,7 @@ function Quiz() {
         setTimeRemaining((prevTime) => {
           if (prevTime <= 1) {
             clearInterval(interval);
-            handleSubmit(); // Automatically submit the quiz when time runs out
+            autoSubmit(); // Auto-submit when time runs out
             return 0;
           }
           return prevTime - 1;
@@ -139,16 +159,15 @@ function Quiz() {
     return `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   };
 
-  // Add a 10-second delay before starting the quiz
+  // 10-second delay before starting the quiz
   const handleStartQuiz = () => {
-    setIsWaiting(true);  // Set the waiting state to true
+    setIsWaiting(true);
     enableFullScreen();
 
-    // Wait for the admin to start the quiz
     setTimeout(() => {
-      setIsWaiting(false);  // Reset waiting state after the delay
-      localStorage.setItem("quizStarted", "true");  // Store the state in localStorage
-    }, 10000);  // 10 seconds delay
+      setIsWaiting(false);
+      localStorage.setItem("quizStarted", "true");
+    }, 10000); // 10 seconds delay
   };
 
   return (
@@ -166,16 +185,16 @@ function Quiz() {
             padding: "12px 20px",
             fontSize: "18px",
             borderRadius: "8px",
-            cursor: isWaiting ? "not-allowed" : "pointer"  // Disable button during wait
+            cursor: isWaiting ? "not-allowed" : "pointer"
           }}
-          onClick={handleStartQuiz} // Trigger start with 10-second delay
-          disabled={isWaiting} // Disable button during the waiting time
+          onClick={handleStartQuiz}
+          disabled={isWaiting}
         >
-          {isWaiting ? "Please wait..." : "Start Quiz"}  {/* Show waiting message */}
+          {isWaiting ? "Please wait..." : "Start Quiz"}
         </button>
       ) : (
         <div style={{ width: "75%", marginTop: "20px" }}>
-          {quizEnded  ? (
+          {quizEnded ? (
             <h1 style={{ color: "red", textAlign: "center" }}>❌ Quiz Over! Time's up.</h1>
           ) : (
             questions.map((q, idx) => (
@@ -183,33 +202,14 @@ function Quiz() {
                 <h2 style={{ color: "#39FF14" }}>{idx + 1}. {q.question}</h2>
                 {q.options.map((opt, i) => (
                   <div key={i} style={{ display: "flex", alignItems: "center" }}>
-                    <input
-                      type="radio"
-                      name={q._id}
-                      value={opt}
-                      checked={answers[q._id] === opt}
-                      onChange={() => handleAnswerChange(q._id, opt)}
-                      disabled={quizEnded} // Disable selection if quiz ended
-                      style={{ marginRight: "10px" }}
-                    />
+                    <input type="radio" name={q._id} value={opt} checked={answers[q._id] === opt} onChange={() => handleAnswerChange(q._id, opt)} disabled={quizEnded} style={{ marginRight: "10px" }} />
                     <label style={{ color: "white" }}>{opt}</label>
                   </div>
                 ))}
               </div>
             ))
           )}
-          <button
-            style={{
-              backgroundColor: quizEnded ? "gray" : "#39FF14",
-              padding: "10px",
-              width: "100%",
-              marginTop: "20px",
-              borderRadius: "5px",
-            }}
-            onClick={handleSubmit}
-          >
-            Submit
-          </button>
+          <button style={{ backgroundColor: quizEnded ? "gray" : "#39FF14", padding: "10px", width: "100%", marginTop: "20px", borderRadius: "5px" }} onClick={handleSubmit}>Submit</button>
         </div>
       )}
     </div>
