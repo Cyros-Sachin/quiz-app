@@ -49,7 +49,6 @@ function Quiz() {
       setHasBlurred(true);
       setQuizEnded(true);
       alert("🚫 You minimized the window! The quiz is now over.");
-      window.location.href("/");
     }
   };
   
