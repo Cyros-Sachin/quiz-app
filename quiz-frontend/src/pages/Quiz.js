@@ -111,14 +111,14 @@ function Quiz() {
   // Handle radio button answer selection (disabled if quiz ended)
   const handleAnswerChange = (questionId, selectedOption) => {
     if (!quizEnded) {
-      setAnswers(prevAnswers => ({
-        ...prevAnswers,
-        [questionId]: selectedOption
-      }));
-
-      console.log("✅ Answer Selected:", questionId, selectedOption); // Debug log
+      setAnswers(prevAnswers => {
+        const updatedAnswers = { ...prevAnswers, [questionId]: selectedOption };
+        console.log("✅ Updated Answers:", updatedAnswers); // 🔍 Log after every selection
+        return updatedAnswers;
+      });
     }
   };
+
 
 
   // Handle quiz submission
@@ -127,16 +127,13 @@ function Quiz() {
 
     let userId = localStorage.getItem("userId");
     if (!userId || userId.length !== 24) {
-      alert("❌ Invalid User ID. Please log in again.");
+      setErrorMessage("❌ Invalid User ID. Please log in again.");
       return;
     }
 
-    // 🛠 Log collected answers before sending
-    console.log("📝 Submitted Answers:", answers);
+    console.log("📝 Answers Before Submit:", answers); // 🔍 Log answers before sending
 
-    // 🔥 Fix: Ensure at least one answer is selected
-    const answeredQuestions = Object.values(answers).filter(ans => ans !== "").length;
-    if (answeredQuestions === 0) {
+    if (Object.keys(answers).length === 0) {
       setErrorMessage("❌ No answers selected! Please attempt at least one question.");
       return;
     }
@@ -152,20 +149,14 @@ function Quiz() {
         document.exitFullscreen();
         window.location.href = "/leaderboard";
       } else {
-        alert("⚠️ Something went wrong, quiz was not submitted!");
+        setErrorMessage("⚠️ Something went wrong, quiz was not submitted!");
       }
     } catch (error) {
       console.error("❌ Quiz submission error:", error);
-
-      if (error.response) {
-        setErrorMessage(`Server Error: ${error.response?.data?.message || "Something went wrong!"}`);
-      } else if (error.request) {
-        alert("❌ No response from server. Check your internet connection.");
-      } else {
-        alert("❌ Something went wrong while submitting.");
-      }
+      setErrorMessage(`Server Error: ${error.response?.data?.message || "Something went wrong!"}`);
     }
   };
+
 
 
 
