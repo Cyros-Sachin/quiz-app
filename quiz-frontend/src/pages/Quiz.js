@@ -136,8 +136,7 @@ function Quiz() {
     }
 
     // ✅ Using callback to get the latest answers state
-    setAnswers((prevAnswers) => {
-      const finalAnswers = { ...prevAnswers };
+    const finalAnswers = { ...prevAnswers };
       console.log("📌 Final Answers at Submit:", finalAnswers); // Debugging log
 
       if (Object.keys(finalAnswers).length === 0) {
@@ -147,7 +146,6 @@ function Quiz() {
 
       // ✅ Make sure submission happens only after getting latest state
       submitQuiz(userId, finalAnswers);
-    });
   };
 
   // ✅ Separate function to handle the API call (keeps it clean)
@@ -157,7 +155,7 @@ function Quiz() {
 
       console.log("✅ Server Response:", response.data);
 
-      if (response.data && response.data.success) {
+      if (response.data?.success) {
         setQuizSubmitted(true);
         localStorage.setItem("quizAttempted", "true");
         document.exitFullscreen();
