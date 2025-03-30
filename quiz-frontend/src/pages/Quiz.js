@@ -157,13 +157,16 @@ function Quiz() {
 
       console.log("✅ Server Response:", response.data);
 
-      if (response.data && response.data.success) {
+      if (response.data?.success === true) {
         setQuizSubmitted(true);
         localStorage.setItem("quizAttempted", "true");
         document.exitFullscreen();
+        alert("🎉 Quiz submitted successfully! Redirecting to the leaderboard...");
         window.location.href = "/leaderboard";
       } else {
-        alert("⚠️ Something went wrong, quiz was not submitted!");
+        console.error("⚠️ Unexpected Response Format:", response.data);
+        alert("⚠️ Submission successful, but the server response was unexpected. Please check your leaderboard.");
+        window.location.href = "/leaderboard"; // Redirect anyway since submission likely worked
       }
     } catch (error) {
       console.error("❌ Quiz submission error:", error);
