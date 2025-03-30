@@ -70,6 +70,7 @@ function Quiz() {
     if (quizStarted && !quizEnded && !quizSubmitted) {
       alert("🚫 You minimized the window! The quiz is now over.");
       setQuizEnded(true);
+      window.location.href('/');
     }
   };
 
