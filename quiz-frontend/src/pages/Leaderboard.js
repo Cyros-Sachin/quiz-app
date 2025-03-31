@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { io } from "socket.io-client";
-const socket = io("https://quiz-app-so3y.onrender.com", {
+const socket = io("http://13.203.101.148:5000", {
   transports: ["websocket"], // Force WebSocket connection (no polling)
   withCredentials: true, // If you need credentials (cookies, etc.)
 });
@@ -13,7 +13,7 @@ function Leaderboard() {
   useEffect(() => {
     // Fetch initial leaderboard data
     axios
-      .get("https://quiz-app-so3y.onrender.com/api/quiz/leaderboard")
+      .get("http://13.203.101.148:5000/api/quiz/leaderboard")
       .then((res) => {
         setLeaderboard(res.data);
         setLoading(false);

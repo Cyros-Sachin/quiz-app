@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { io } from "socket.io-client";
 
-const socket = io("https://quiz-app-so3y.onrender.com", {
+const socket = io("http://13.203.101.148:5000", {
   transports: ["websocket"], // Force WebSocket connection (no polling)
   withCredentials: true, // If you need credentials (cookies, etc.)
 });
@@ -94,7 +94,7 @@ function Quiz() {
     });
 
     // Fetch questions from the backend
-    axios.get("https://quiz-app-so3y.onrender.com/api/questions").then((res) => {
+    axios.get("http://13.203.101.148:5000/api/questions").then((res) => {
       setQuestions(res.data);
     });
 
@@ -153,7 +153,7 @@ function Quiz() {
   // ✅ Separate function to handle the API call (keeps it clean)
   const submitQuiz = async (userId, finalAnswers) => {
     try {
-      const response = await axios.post("https://quiz-app-so3y.onrender.com/api/quiz/submit", { userId, answers: finalAnswers });
+      const response = await axios.post("http://13.203.101.148:5000/api/quiz/submit", { userId, answers: finalAnswers });
 
       console.log("✅ Server Response:", response.data);
 
