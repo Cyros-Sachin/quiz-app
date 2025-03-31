@@ -664,49 +664,83 @@ table td:hover {
 .but:hover {
   box-shadow: inset 0px 0px 25px #1479EA;
 }
+/* Ensure quiz container is the only scrollable area */
+/* Main Quiz Container */
+.quiz-container {
+  max-height: 70vh; /* Prevents page overflow */
+  overflow-y: auto; /* Enables smooth scrolling */
+  padding: 10px;
+  border: 2px solid #39FF14;
+  border-radius: 8px;
+  background-color: #1A1A1A;
+  width: 80%;
+  margin: auto; /* Center it */
+  scrollbar-width: thin;
+  scrollbar-color: #39FF14 #1A1A1A;
+}
+
+/* Custom Scrollbar */
+.quiz-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.quiz-container::-webkit-scrollbar-thumb {
+  background-color: #39FF14;
+  border-radius: 6px;
+}
+
+.quiz-container::-webkit-scrollbar-track {
+  background-color: #1A1A1A;
+}
+
+/* Each Question Box */
+.question-box {
+  background-color: #252525;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  color: #39FF14;
+}
+
+/* Ensures radio and label are perfectly in line */
+.option-container {
+  display: flex;
+  align-items: center;  /* Aligns radio & label properly */
+  gap: 10px;
+  padding: 5px 0;
+}
+
+/* Custom Radio Button */
 .radio {
-  -webkit-appearance: none;
- /* remove default */
-  display: block;
-  margin-right: 10px;
-  width: 24px;
-  height: 24px;
-  border-radius: 12px;
+  width: 18px;
+  height: 18px;
   cursor: pointer;
-  vertical-align: middle;
-  box-shadow: hsla(0,0%,100%,.15) 0 1px 1px, inset hsla(0,0%,0%,.5) 0 0 0 1px;
-  background-color: hsla(0,0%,0%,.2);
-  background-image: -webkit-radial-gradient( hsla(200,100%,90%,1) 0%, hsla(200,100%,70%,1) 15%, hsla(200,100%,60%,.3) 28%, hsla(200,100%,30%,0) 70% );
-  background-repeat: no-repeat;
-  -webkit-transition: background-position .15s cubic-bezier(.8, 0, 1, 1),
-    -webkit-transform .25s cubic-bezier(.8, 0, 1, 1);
-  outline: none;
+  appearance: none;
+  border: 2px solid #39FF14;
+  border-radius: 50%;
+  background-color: transparent;
+  transition: all 0.2s ease-in-out;
+  display: inline-block;
+  vertical-align: middle; /* Ensures perfect alignment */
 }
 
+/* When Checked */
 .radio:checked {
-  -webkit-transition: background-position .2s .15s cubic-bezier(0, 0, .2, 1),
-    -webkit-transform .25s cubic-bezier(0, 0, .2, 1);
+  background-color: #39FF14;
+  border: 2px solid #39FF14;
 }
 
-.radio:active {
-  -webkit-transform: scale(1.5);
-  -webkit-transition: -webkit-transform .1s cubic-bezier(0, 0, .2, 1);
+/* Option Text */
+.option-container .label {
+  color: white;
+  font-size: 18px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-bottom: 1.5rem;
 }
 
-
-
-/* The up/down direction logic */
-
-.radio,
-.radio:active {
-  background-position: 0 24px;
+/* Prevent Page Overflow */
+body {
+  overflow: hidden;
 }
 
-.radio:checked {
-  background-position: 0 0;
-}
-
-.radio:checked ~ .radio,
-.radio:checked ~ .radio:active {
-  background-position: 0 -24px;
-}

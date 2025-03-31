@@ -15,7 +15,7 @@ function Quiz() {
   const [quizEnded, setQuizEnded] = useState(false);
   const [isWaiting, setIsWaiting] = useState(false);
   const [quizSubmitted, setQuizSubmitted] = useState(false);
-  const [timeRemaining, setTimeRemaining] = useState(60*30); // Timer in seconds (10 sec for testing, change as needed)
+  const [timeRemaining, setTimeRemaining] = useState(60 * 30); // Timer in seconds (10 sec for testing, change as needed)
   const [exitWarnings, setExitWarnings] = useState(0); // Track ESC warnings
   const [hasBlurred, setHasBlurred] = useState(false);
   // Full-screen mode function
@@ -222,8 +222,8 @@ function Quiz() {
 
   return (
     <div style={{ width: "100vw", height: "100vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", backgroundColor: "#2D2D2D" }}>
-      {!quizStarted ?
-        (<div aria-label="Orange and tan hamster running in a metal wheel" role="img" className="wheel-and-hamster">
+      {!quizStarted ? (
+        <div aria-label="Orange and tan hamster running in a metal wheel" role="img" className="wheel-and-hamster">
           <div className="wheel" />
           <div className="hamster">
             <div className="hamster__body">
@@ -240,21 +240,15 @@ function Quiz() {
             </div>
           </div>
           <div className="spoke" />
-        </div>) : (<div></div>)
-      }
+        </div>
+      ) : null}
 
       <div style={{ position: "absolute", top: "20px", right: "20px", color: "#00fffb", fontSize: "24px", fontWeight: "700" }}>
         {!quizEnded && formatTime(timeRemaining)}
       </div>
 
-
-
       {!quizStarted ? (
-        <button className="button" style={{
-          cursor: isWaiting ? "not-allowed" : "pointer"
-        }}
-          onClick={handleStartQuiz}
-          disabled={isWaiting}>
+        <button className="button" style={{ cursor: isWaiting ? "not-allowed" : "pointer" }} onClick={handleStartQuiz} disabled={isWaiting}>
           <span>{isWaiting ? "Please wait..." : "Start Quiz"}</span>
         </button>
       ) : (
@@ -262,22 +256,33 @@ function Quiz() {
           {quizEnded ? (
             <h1 style={{ color: "red", textAlign: "center" }}>❌ Quiz Over! Time's up.</h1>
           ) : (
-            questions.map((q, idx) => (
-              <div key={q._id} style={{ backgroundColor: "#1A1A1A", padding: "20px", borderRadius: "8px", marginBottom: "10px" }}>
-                <h2 style={{ color: "#39FF14" }}>{idx + 1}. {q.question}</h2>
-                {q.options.map((opt, i) => (
-                  <div key={i} style={{ display: "flex", alignItems: "center" }}>
-                    <input className="radio" type="radio" name={q._id} value={opt} checked={answers[q._id] === opt} onChange={() => handleAnswerChange(q._id, opt)} disabled={quizEnded} style={{ marginRight: "10px" }} />
-                    <label style={{ color: "white" }}>{opt}</label>
-                  </div>
-                ))}
-              </div>
-            ))
+            <div className="quiz-container">  {/* SINGLE SCROLLABLE CONTAINER */}
+              {questions.map((q, idx) => (
+                <div key={q._id} className="question-box">
+                  <h2>{idx + 1}. {q.question}</h2>
+                  {q.options.map((opt, i) => (
+                    <div key={i} className="option-container">
+                      <input
+                        className="radio"
+                        type="radio"
+                        name={q._id}
+                        value={opt}
+                        checked={answers[q._id] === opt}
+                        onChange={() => handleAnswerChange(q._id, opt)}
+                        disabled={quizEnded}
+                      />
+                      <label className="label">{opt}</label>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
           )}
           <button style={{ backgroundColor: quizEnded ? "gray" : "#39FF14", padding: "10px", width: "100%", marginTop: "20px", borderRadius: "5px" }} onClick={handleSubmit}>Submit</button>
         </div>
       )}
     </div>
+
   );
 }
 
