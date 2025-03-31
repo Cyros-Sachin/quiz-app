@@ -739,8 +739,5 @@ table td:hover {
   margin-bottom: 1.5rem;
 }
 
-/* Prevent Page Overflow */
-body {
-  overflow: hidden;
-}
+
 
