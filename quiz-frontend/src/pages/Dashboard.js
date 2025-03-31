@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 
-const socket = io("wss://13.203.101.148:5000", {
+const socket = io("https://quiz-app-so3y.onrender.com", {
   transports: ["websocket"], // Force WebSocket connection (no polling)
   withCredentials: true, // If you need credentials (cookies, etc.)
 });
